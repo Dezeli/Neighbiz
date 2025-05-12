@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from users.models import User, UserImage
 
 
@@ -32,3 +35,23 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         UserImage.objects.create(user=user, image_url=image_url)
         return user
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+        token['role'] = user.role
+        token['is_verified'] = user.is_verified
+        return token
+
+    def validate(self, attrs):
+        try:
+            data = super().validate(attrs)
+        except AuthenticationFailed:
+            raise AuthenticationFailed("아이디 또는 비밀번호가 올바르지 않습니다.")
+        data['username'] = self.user.username
+        data['role'] = self.user.role
+        data['is_verified'] = self.user.is_verified
+        return data
