@@ -10,10 +10,14 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.core.cache import cache
+from django.conf import settings
 
 import random
+import boto3
+from botocore.exceptions import ClientError
 from datetime import timedelta
 from decouple import config
+from urllib.parse import urlparse
 
 User = get_user_model()
 
@@ -50,14 +54,48 @@ class SignupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("이미 등록된 전화번호입니다.")
         return value
 
+    def validate_image_url(self, value):
+        s3_key = self._extract_s3_key(value)
+
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME,
+        )
+
+        try:
+            response = s3.head_object(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=s3_key
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                raise serializers.ValidationError("S3에 해당 이미지가 존재하지 않습니다.")
+            raise serializers.ValidationError("S3 검증 중 오류가 발생했습니다.")
+
+        size = response.get("ContentLength", 0)
+        content_type = response.get("ContentType", "")
+
+        if content_type not in ["image/jpeg", "image/png"]:
+            raise serializers.ValidationError("이미지 형식은 JPEG 또는 PNG만 허용됩니다.")
+
+        if size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("이미지 크기는 5MB를 초과할 수 없습니다.")
+
+        return value
+
+    def _extract_s3_key(self, url):
+        parsed = urlparse(url)
+        return parsed.path.lstrip("/")
+
     def create(self, validated_data):
         image_url = validated_data.pop('image_url')
         user = User.objects.create_user(**validated_data)
         UserImage.objects.create(user=user, image_url=image_url)
-
         EmailVerification.objects.filter(email=user.email).delete()
-
         return user
+
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
