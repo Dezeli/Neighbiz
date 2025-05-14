@@ -43,9 +43,6 @@ class SignupSerializer(serializers.ModelSerializer):
         except EmailVerification.DoesNotExist:
             raise serializers.ValidationError("이메일 인증이 완료되지 않았습니다.")
 
-        if timezone.now() - record.created_at > timedelta(minutes=3):
-            raise serializers.ValidationError("이메일 인증이 만료되었습니다. 다시 인증해주세요.")
-
         return value
 
     def validate_phone_number(self, value):
