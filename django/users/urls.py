@@ -12,4 +12,5 @@ urlpatterns = [
     path('auth/find-id/', FindIDView.as_view(), name='find-id'),
     path('auth/email-verify/send/', EmailVerificationSendView.as_view(), name='email-verify-send'),
     path('auth/email-verify/confirm/', EmailVerificationConfirmView.as_view(), name='email-verify-confirm'),
+    path('auth/image-upload/', ImageUploadPresignedURLView.as_view(), name='image-upload'),
 ]

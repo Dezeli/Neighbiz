@@ -3,12 +3,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 from users.serializers import *
 
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+
+import boto3
+import uuid
+from botocore.exceptions import ClientError
 
 
 class SignupView(APIView):
@@ -160,3 +164,56 @@ class EmailVerificationConfirmView(APIView):
             "message": "입력값 오류",
             "data": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ImageUploadPresignedURLView(APIView):
+    def post(self, request):
+        serializer = PresignedURLRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                "success": False,
+                "message": "입력값 오류",
+                "data": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        filename = serializer.validated_data["filename"]
+        content_type = serializer.validated_data["content_type"]
+
+        ext = filename.split('.')[-1]
+        unique_filename = f"{uuid.uuid4()}.{ext}"
+        s3_key = f"{settings.AWS_S3_IMAGE_FOLDER}/{unique_filename}"
+
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        try:
+            presigned_url = s3_client.generate_presigned_url(
+                "put_object",
+                Params={
+                    "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
+                    "Key": s3_key,
+                    "ContentType": content_type
+                },
+                ExpiresIn=300
+            )
+        except ClientError as e:
+            return Response({
+                "success": False,
+                "message": "S3 URL 생성 중 오류 발생",
+                "data": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        final_image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
+
+        return Response({
+            "success": True,
+            "message": "Presigned URL 생성 성공",
+            "data": {
+                "upload_url": presigned_url,
+                "image_url": final_image_url
+            }
+        }, status=status.HTTP_200_OK)

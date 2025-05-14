@@ -256,3 +256,7 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
     def save(self):
         self.record.is_verified = True
         self.record.save()
+
+class PresignedURLRequestSerializer(serializers.Serializer):
+    filename = serializers.CharField()
+    content_type = serializers.CharField()
