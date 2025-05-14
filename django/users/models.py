@@ -61,3 +61,14 @@ class UserImage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.image_url}"
+
+
+
+class EmailVerification(models.Model):
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} ({'verified' if self.is_verified else 'pending'})"
