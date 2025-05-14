@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
 
+
 class SignupView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -26,6 +27,7 @@ class SignupView(APIView):
             "message": "입력값 오류",
             "data": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -132,6 +134,24 @@ class EmailVerificationSendView(APIView):
             return Response({
                 "success": True,
                 "message": "이메일로 인증 코드를 전송했습니다.",
+                "data": None
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "success": False,
+            "message": "입력값 오류",
+            "data": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class EmailVerificationConfirmView(APIView):
+    def post(self, request):
+        serializer = EmailVerificationConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "success": True,
+                "message": "이메일 인증이 완료되었습니다.",
                 "data": None
             }, status=status.HTTP_200_OK)
 

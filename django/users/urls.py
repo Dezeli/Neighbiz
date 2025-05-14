@@ -11,4 +11,5 @@ urlpatterns = [
     path('auth/reset-password-validate/', PasswordResetTokenValidateView.as_view(), name='reset-password-validate'),
     path('auth/find-id/', FindIDView.as_view(), name='find-id'),
     path('auth/email-verify/send/', EmailVerificationSendView.as_view(), name='email-verify-send'),
+    path('auth/email-verify/confirm/', EmailVerificationConfirmView.as_view(), name='email-verify-confirm'),
 ]

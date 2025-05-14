@@ -10,8 +10,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.core.cache import cache
-from decouple import config
+
 import random
+from datetime import timedelta
+from decouple import config
 
 User = get_user_model()
 
@@ -35,6 +37,15 @@ class SignupSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("이미 등록된 이메일입니다.")
+
+        try:
+            record = EmailVerification.objects.filter(email=value, is_verified=True).latest('created_at')
+        except EmailVerification.DoesNotExist:
+            raise serializers.ValidationError("이메일 인증이 완료되지 않았습니다.")
+
+        if timezone.now() - record.created_at > timedelta(minutes=3):
+            raise serializers.ValidationError("이메일 인증이 만료되었습니다. 다시 인증해주세요.")
+
         return value
 
     def validate_phone_number(self, value):
@@ -46,6 +57,9 @@ class SignupSerializer(serializers.ModelSerializer):
         image_url = validated_data.pop('image_url')
         user = User.objects.create_user(**validated_data)
         UserImage.objects.create(user=user, image_url=image_url)
+
+        EmailVerification.objects.filter(email=user.email).delete()
+
         return user
 
 
@@ -215,3 +229,33 @@ class EmailVerificationSendSerializer(serializers.Serializer):
 
     def _generate_code(self):
         return str(random.randint(100000, 999999))
+
+
+class EmailVerificationConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        code = attrs.get("code")
+
+        try:
+            record = EmailVerification.objects.filter(email=email).latest("created_at")
+        except EmailVerification.DoesNotExist:
+            raise serializers.ValidationError("인증 요청이 존재하지 않습니다.")
+
+        if record.is_verified:
+            raise serializers.ValidationError("이미 인증이 완료된 이메일입니다.")
+
+        if timezone.now() - record.created_at > timedelta(minutes=3):
+            raise serializers.ValidationError("인증 코드가 만료되었습니다.")
+
+        if record.code != code:
+            raise serializers.ValidationError("인증 코드가 일치하지 않습니다.")
+
+        self.record = record
+        return attrs
+
+    def save(self):
+        self.record.is_verified = True
+        self.record.save()
