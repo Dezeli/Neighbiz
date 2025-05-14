@@ -2,9 +2,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User, UserImage
+from users.models import User, UserImage, EmailVerification
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
@@ -179,21 +180,34 @@ class EmailVerificationSendSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
+        from users.models import User
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("이미 가입된 이메일입니다.")
         return value
 
     def save(self):
-        email = self.validated_data["email"]
+        email = self.validated_data['email']
         code = self._generate_code()
-        cache.set(f"email_verify:{email}", code, timeout=180)  # 3분 TTL
 
-        subject = "[서비스명] 이메일 인증 코드"
-        message = f"요청하신 인증 코드는 다음과 같습니다:\n\n{code}\n\n3분 이내에 입력해주세요."
+        EmailVerification.objects.create(
+            email=email,
+            code=code,
+            is_verified=False,
+        )
+
+        subject = "Neighviz 이메일 인증 코드"
+        message = f"""
+            Neighviz 회원가입을 위한 인증 코드입니다.
+            인증 코드는 다음과 같습니다:
+
+            {code}
+
+            이 코드는 3분간 유효합니다.
+        """.strip()
 
         send_mail(
-            subject=subject.strip(),
-            message=message.strip(),
+            subject=subject,
+            message=message,
             from_email=config("DEFAULT_FROM_EMAIL"),
             recipient_list=[email],
             fail_silently=False
