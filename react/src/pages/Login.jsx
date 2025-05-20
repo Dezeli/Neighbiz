@@ -44,6 +44,11 @@ function Login() {
       />
       <button onClick={handleLogin}>로그인</button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <div style={{ marginTop: '1rem' }}>
+        <button onClick={() => navigate('/find-id')}>아이디 찾기</button>
+        <button onClick={() => navigate('/reset-password')}>비밀번호 찾기</button>
+      </div>
     </div>
   );
 }

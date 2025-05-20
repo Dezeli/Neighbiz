@@ -135,9 +135,9 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         token = default_token_generator.make_token(user)
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_link = f"{config('FRONTEND_URL')}/reset-password?uid={uidb64}&token={token}"
+        reset_link = f"{config('FRONTEND_URL')}/reset-password-confirm?uid={uidb64}&token={token}"
 
-        subject = "[서비스명] 비밀번호 재설정 링크 안내"
+        subject = "[Neighviz] 비밀번호 재설정 링크 안내"
         message = f"""
                 {user.name}님,
 

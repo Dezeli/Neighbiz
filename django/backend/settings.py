@@ -3,8 +3,7 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-SECRET_KEY = 'django-insecure-_)zuu!wm48g==*h))f!3254gwg@h0f%_^8%#0f8m+a($0ab98a'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 DEBUG = True
 
