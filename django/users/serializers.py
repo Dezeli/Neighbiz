@@ -298,3 +298,16 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
 class PresignedURLRequestSerializer(serializers.Serializer):
     filename = serializers.CharField()
     content_type = serializers.CharField()
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'name',
+            'email',
+            'role',
+            'is_verified',
+        ]

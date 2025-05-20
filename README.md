@@ -35,6 +35,7 @@
 * [비밀번호 재설정 완료](#비밀번호-재설정-완료)
 * [아이디 찾기](#아이디-찾기)
 * [Presigned 이미지 업로드](#presigned-이미지-업로드)
+* [현재 로그인 사용자 정보 조회](#현재-로그인-사용자-정보-조회)
 
 ---
 
@@ -403,6 +404,51 @@
   "message": "입력값 오류",
   "data": {
     "content_type": ["지원하지 않는 형식입니다."]
+  }
+}
+```
+
+
+## 현재 로그인 사용자 정보 조회
+### GET `/auth/me/`
+
+* 로그인된 사용자의 정보를 조회.
+
+**Request**
+* Headers
+```http
+Authorization: Bearer <access_token>
+```
+**Response 200 (성공)**
+```json
+{
+  "success": true,
+  "message": "현재 로그인한 사용자 정보입니다.",
+  "data": {
+    "id": 1,
+    "username": "exampleuser",
+    "name": "홍길동",
+    "email": "user@example.com",
+    "role": "user",
+    "is_verified": true
+  }
+}
+```
+**Response 401 (토큰 오류)**
+```json
+{
+  "success": false,
+  "message": "Given token not valid for any token type",
+  "data": {
+    "detail": "Given token not valid for any token type",
+    "code": "token_not_valid",
+    "messages": [
+      {
+        "token_class": "AccessToken",
+        "token_type": "access",
+        "message": "Token is invalid"
+      }
+    ]
   }
 }
 ```
