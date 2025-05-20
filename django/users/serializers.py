@@ -39,13 +39,16 @@ class SignupSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("이미 등록된 이메일입니다.")
+        valid_time = timezone.now() - timedelta(minutes=10)
 
         try:
-            record = EmailVerification.objects.filter(email=value, is_verified=True).latest('created_at')
+            record = EmailVerification.objects.filter(
+                email=value,
+                is_verified=True,
+                created_at__gte=valid_time
+            ).latest('created_at')
         except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError("이메일 인증이 완료되지 않았습니다.")
+            raise serializers.ValidationError("이메일 인증이 완료되지 않았거나 만료되었습니다.")
 
         return value
 
@@ -238,6 +241,8 @@ class EmailVerificationSendSerializer(serializers.Serializer):
         email = self.validated_data['email']
         code = self._generate_code()
 
+        EmailVerification.objects.filter(email=email).delete()
+
         EmailVerification.objects.create(
             email=email,
             code=code,
@@ -254,13 +259,16 @@ class EmailVerificationSendSerializer(serializers.Serializer):
             이 코드는 3분간 유효합니다.
         """.strip()
 
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=config("DEFAULT_FROM_EMAIL"),
-            recipient_list=[email],
-            fail_silently=False
-        )
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=config("DEFAULT_FROM_EMAIL"),
+                recipient_list=[email],
+                fail_silently=False
+            )
+        except Exception as e:
+            raise serializers.ValidationError("이메일 전송 중 오류가 발생했습니다.")
 
     def _generate_code(self):
         return str(random.randint(100000, 999999))
