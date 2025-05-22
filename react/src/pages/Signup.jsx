@@ -1,6 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import api from '../lib/axios';
+
+const Container = styled.div`
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: linear-gradient(to right, #f8fafc, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Pretendard', sans-serif;
+`;
+
+const Title = styled.h1`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+`;
+
+const Form = styled.div`
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const Input = styled.input`
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: white;
+
+  &:focus {
+    border-color: #2563eb;
+  }
+`;
+
+const Button = styled.button`
+  padding: 12px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background-color: #1d4ed8;
+  }
+`;
+
+const SubButton = styled(Button)`
+  background-color: white;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+
+  &:hover {
+    background-color: #eff6ff;
+  }
+`;
+
+const Text = styled.p`
+  font-size: 0.9rem;
+  color: ${({ type }) =>
+    type === 'error' ? 'red' : type === 'success' ? 'green' : '#374151'};
+  margin: 4px 0;
+`;
+
+const ImagePreview = styled.img`
+  margin-top: 8px;
+  width: 120px;
+  border-radius: 6px;
+`;
 
 function Signup() {
   const [form, setForm] = useState({
@@ -99,35 +178,34 @@ function Signup() {
   };
 
   return (
-    <div>
-      <h1>회원가입</h1>
-      <input name="username" placeholder="아이디" onChange={handleChange} />
-      <input name="name" placeholder="이름" onChange={handleChange} />
+    <Container>
+      <Title>회원가입</Title>
+      <Form>
+        <Input name="username" placeholder="아이디" onChange={handleChange} />
+        <Input name="name" placeholder="이름" onChange={handleChange} />
+        <Input name="email" placeholder="이메일" onChange={handleChange} />
+        <SubButton onClick={handleSendEmailCode}>인증코드 전송</SubButton>
+        {emailMsg && <Text>{emailMsg}</Text>}
 
-      <input name="email" placeholder="이메일" onChange={handleChange} />
-      <button onClick={handleSendEmailCode}>인증코드 전송</button>
-      {emailMsg && <p>{emailMsg}</p>}
+        <Input
+          placeholder="인증코드 입력"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
+        <SubButton onClick={handleConfirmEmailCode}>인증코드 확인</SubButton>
+        {codeMsg && <Text>{codeMsg}</Text>}
 
-      <input
-        placeholder="인증코드 입력"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-      />
-      <button onClick={handleConfirmEmailCode}>인증코드 확인</button>
-      {codeMsg && <p>{codeMsg}</p>}
+        <Input name="phone_number" placeholder="전화번호" onChange={handleChange} />
+        <Input name="password" type="password" placeholder="비밀번호" onChange={handleChange} />
+        <Input type="file" accept="image/*" onChange={handleImageUpload} />
+        {uploadMsg && <Text>{uploadMsg}</Text>}
+        {previewUrl && <ImagePreview src={previewUrl} alt="미리보기" />}
 
-      <input name="phone_number" placeholder="전화번호" onChange={handleChange} />
-      <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} />
-
-      {/* ✅ 이미지 업로드 */}
-      <input type="file" accept="image/*" onChange={handleImageUpload} />
-      {uploadMsg && <p>{uploadMsg}</p>}
-      {previewUrl && <img src={previewUrl} alt="미리보기" width={120} />}
-
-      <button onClick={handleSignup}>가입하기</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
-    </div>
+        <Button onClick={handleSignup}>가입하기</Button>
+        {error && <Text type="error">{error}</Text>}
+        {successMsg && <Text type="success">{successMsg}</Text>}
+      </Form>
+    </Container>
   );
 }
 
