@@ -5,13 +5,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
+
 from users.serializers import *
+from utils.response import success_response, error_response
 
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-
 import boto3
 import uuid
 from botocore.exceptions import ClientError
@@ -22,18 +20,8 @@ class SignupView(APIView):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": "회원가입 성공",
-                "data": None
-            }, status=status.HTTP_201_CREATED)
-
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-
+            return success_response("회원가입 성공", status=status.HTTP_201_CREATED)
+        return error_response("입력값 오류", serializer.errors)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -44,17 +32,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         try:
             serializer.is_valid(raise_exception=True)
         except AuthenticationFailed as e:
-            return Response({
-                "success": False,
-                "message": str(e),
-                "data": None
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return error_response(str(e), status=status.HTTP_401_UNAUTHORIZED)
 
-        return Response({
-            "success": True,
-            "message": "로그인에 성공했습니다.",
-            "data": serializer.validated_data
-        }, status=status.HTTP_200_OK)
+        return success_response("로그인에 성공했습니다.", serializer.validated_data)
 
 
 class PasswordResetRequestView(APIView):
@@ -62,17 +42,8 @@ class PasswordResetRequestView(APIView):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": "비밀번호 재설정 링크를 이메일로 전송했습니다.",
-                "data": None
-            }, status=status.HTTP_200_OK)
-
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            return success_response("비밀번호 재설정 링크를 이메일로 전송했습니다.")
+        return error_response("입력값 오류", serializer.errors)
 
 
 class PasswordResetConfirmView(APIView):
@@ -80,18 +51,10 @@ class PasswordResetConfirmView(APIView):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": "비밀번호가 성공적으로 변경되었습니다.",
-                "data": None
-            }, status=status.HTTP_200_OK)
+            return success_response("비밀번호가 성공적으로 변경되었습니다.")
+        return error_response("입력값 오류", serializer.errors)
 
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class PasswordResetTokenValidateView(APIView):
     def get(self, request):
         data = {
@@ -99,84 +62,43 @@ class PasswordResetTokenValidateView(APIView):
             'token': request.GET.get("token")
         }
         serializer = PasswordResetTokenValidateSerializer(data=data)
-
         if serializer.is_valid():
-            return Response({
-                "success": True,
-                "message": "유효한 링크입니다.",
-                "data": None
-            }, status=status.HTTP_200_OK)
+            return success_response("유효한 링크입니다.")
+        return error_response("유효하지 않은 링크입니다.", serializer.errors)
 
-        return Response({
-            "success": False,
-            "message": "유효하지 않은 링크입니다.",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
 
 class FindIDView(APIView):
     def post(self, request):
         serializer = FindIDSerializer(data=request.data)
         if serializer.is_valid():
             masked_username = serializer.get_masked_username()
-            return Response({
-                "success": True,
-                "message": "일치하는 계정이 확인되었습니다.",
-                "data": {
-                    "username": masked_username
-                }
-            }, status=status.HTTP_200_OK)
+            return success_response("일치하는 계정이 확인되었습니다.", {"username": masked_username})
+        return error_response("입력값 오류", serializer.errors)
 
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
 
 class EmailVerificationSendView(APIView):
     def post(self, request):
         serializer = EmailVerificationSendSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": "이메일로 인증 코드를 전송했습니다.",
-                "data": None
-            }, status=status.HTTP_200_OK)
+            return success_response("이메일로 인증 코드를 전송했습니다.")
+        return error_response("입력값 오류", serializer.errors)
 
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class EmailVerificationConfirmView(APIView):
     def post(self, request):
         serializer = EmailVerificationConfirmSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": "이메일 인증이 완료되었습니다.",
-                "data": None
-            }, status=status.HTTP_200_OK)
-
-        return Response({
-            "success": False,
-            "message": "입력값 오류",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            return success_response("이메일 인증이 완료되었습니다.")
+        return error_response("입력값 오류", serializer.errors)
 
 
 class ImageUploadPresignedURLView(APIView):
     def post(self, request):
         serializer = PresignedURLRequestSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response({
-                "success": False,
-                "message": "입력값 오류",
-                "data": serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return error_response("입력값 오류", serializer.errors)
 
         filename = serializer.validated_data["filename"]
         content_type = serializer.validated_data["content_type"]
@@ -203,29 +125,18 @@ class ImageUploadPresignedURLView(APIView):
                 ExpiresIn=300
             )
         except ClientError as e:
-            return Response({
-                "success": False,
-                "message": "S3 URL 생성 중 오류 발생",
-                "data": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return error_response("S3 URL 생성 중 오류 발생", str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         final_image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
 
-        return Response({
-            "success": True,
-            "message": "Presigned URL 생성 성공",
-            "data": {
-                "upload_url": presigned_url,
-                "image_url": final_image_url
-            }
-        }, status=status.HTTP_200_OK)
+        return success_response("Presigned URL 생성 성공", {
+            "upload_url": presigned_url,
+            "image_url": final_image_url
+        })
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def auth_me(request):
     serializer = UserMeSerializer(request.user)
-    return Response({
-        "success": True,
-        "message": "현재 로그인한 사용자 정보입니다.",
-        "data": serializer.data
-    })
+    return success_response("현재 로그인한 사용자 정보입니다.", serializer.data)
