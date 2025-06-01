@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -836,11 +836,13 @@ const FloatingElement = styled.div`
 
 function Landing() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
+
+    if (location.pathname === '/' && token) {
       navigate('/main', { replace: true });
     }
 
@@ -850,7 +852,7 @@ function Landing() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [navigate]);
+  }, [location.pathname, navigate]);
 
   return (
     <>
