@@ -556,19 +556,17 @@ function PostCreate() {
   }, []);
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files).slice(0, 5); // 최대 5장
+    const files = Array.from(e.target.files).slice(0, 5);
     setImages(files);
-    
-    // 이미지 미리보기 URL 생성
     const previewUrls = files.map(file => URL.createObjectURL(file));
     setImagePreviewUrls(previewUrls);
   };
 
-  const toggleCategory = (catName) => {
+  const toggleCategory = (catId) => {
     setSelectedCategories(prev =>
-      prev.includes(catName)
-        ? prev.filter(c => c !== catName)
-        : [...prev, catName]
+      prev.includes(catId)
+        ? prev.filter(id => id !== catId)
+        : [...prev, catId]
     );
   };
 
@@ -584,6 +582,7 @@ function PostCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (images.length === 0) {
       alert('이미지는 최소 1장 이상 업로드해야 합니다.');
       return;
@@ -597,13 +596,18 @@ function PostCreate() {
     setIsSubmitting(true);
 
     try {
-      // presigned URL 요청
+      // Presigned URL 요청
       const uploadUrls = await Promise.all(
-        images.map(() => api.post('/posts/image-upload/'))
+        images.map(file =>
+          api.post('/posts/image-upload/', {
+            filename: file.name,
+            content_type: file.type,
+          })
+        )
       );
       const uploadLinks = uploadUrls.map(res => res.data.data);
 
-      // 실제 S3 업로드
+      // S3 직접 업로드
       await Promise.all(
         images.map((file, i) =>
           fetch(uploadLinks[i].upload_url, {
@@ -616,13 +620,16 @@ function PostCreate() {
         )
       );
 
-      // 이미지 URL 추출
-      const imageUrls = uploadLinks.map(link => link.public_url);
+      // 이미지 데이터 구성 (첫 번째 이미지를 썸네일로 지정)
+      const imageData = uploadLinks.map((link, index) => ({
+        image_url: link.image_url,
+        is_thumbnail: index === 0,
+      }));
 
-      // 게시글 등록
+      // 게시글 업로드
       await api.post('/posts/', {
         ...form,
-        images: imageUrls,
+        images: imageData,
         partnership_categories: selectedCategories,
       });
 
@@ -640,7 +647,6 @@ function PostCreate() {
     <>
       <GlobalStyle />
       <Container>
-        {/* Floating Elements */}
         <FloatingElement size="40px" top="10%" left="10%" duration="4s" delay="0s" />
         <FloatingElement size="30px" top="20%" left="85%" duration="3s" delay="1s" />
         <FloatingElement size="50px" top="70%" left="5%" duration="5s" delay="2s" />
@@ -653,110 +659,67 @@ function PostCreate() {
 
         <FormContainer>
           <Form onSubmit={handleSubmit}>
+            {/* 기본 정보 */}
             <FormSection delay="0.1s">
               <SectionTitle>📝 기본 정보</SectionTitle>
               <InputGroup>
                 <Label>게시글 제목 *</Label>
-                <Input 
-                  name="title" 
-                  placeholder="매력적인 제목을 입력해주세요" 
-                  value={form.title}
-                  onChange={handleChange} 
-                  required 
-                />
+                <Input name="title" value={form.title} onChange={handleChange} required placeholder="매력적인 제목을 입력해주세요" />
               </InputGroup>
               <InputGroup>
                 <Label>사업장 이름 *</Label>
-                <Input 
-                  name="store_name" 
-                  placeholder="사업장 또는 브랜드명을 입력해주세요" 
-                  value={form.store_name}
-                  onChange={handleChange} 
-                  required 
-                />
+                <Input name="store_name" value={form.store_name} onChange={handleChange} required placeholder="사업장 또는 브랜드명을 입력해주세요" />
               </InputGroup>
             </FormSection>
 
+            {/* 이미지 업로드 */}
             <FormSection delay="0.2s">
               <SectionTitle>📷 대표 이미지</SectionTitle>
               <FileUploadContainer>
-                <FileInput 
-                  id="imageUpload"
-                  type="file" 
-                  accept="image/*" 
-                  multiple 
-                  onChange={handleFileChange} 
-                />
+                <FileInput id="imageUpload" type="file" accept="image/*" multiple onChange={handleFileChange} />
                 <FileUploadLabel htmlFor="imageUpload">
                   <FileUploadIcon>📸</FileUploadIcon>
-                  <FileUploadText>
-                    <strong>이미지를 선택하거나 드래그해주세요</strong>
-                    <br />
-                    최대 5장까지 업로드 가능합니다
-                  </FileUploadText>
+                  <FileUploadText><strong>이미지를 선택하거나 드래그해주세요</strong><br />최대 5장까지 업로드 가능합니다</FileUploadText>
                   <FileUploadHint>JPG, PNG, WEBP (최대 10MB)</FileUploadHint>
                 </FileUploadLabel>
-                
+
                 {imagePreviewUrls.length > 0 && (
                   <ImagePreviewContainer>
                     {imagePreviewUrls.map((url, index) => (
-                      <ImagePreview key={index}>
-                        <img src={url} alt={`미리보기 ${index + 1}`} />
-                      </ImagePreview>
+                      <ImagePreview key={index}><img src={url} alt={`미리보기 ${index + 1}`} /></ImagePreview>
                     ))}
                   </ImagePreviewContainer>
                 )}
               </FileUploadContainer>
             </FormSection>
 
+            {/* 상세 정보 */}
             <FormSection delay="0.3s">
               <SectionTitle>📋 상세 정보</SectionTitle>
               <InputGroup>
                 <Label>사업장 소개 *</Label>
-                <TextArea 
-                  name="description" 
-                  placeholder="사업장에 대한 자세한 소개를 작성해주세요&#10;- 주요 사업 분야&#10;- 특징 및 강점&#10;- 제공 서비스 등"
-                  value={form.description}
-                  onChange={handleChange} 
-                  required 
-                />
+                <TextArea name="description" value={form.description} onChange={handleChange} required placeholder="사업장에 대한 자세한 소개를 작성해주세요&#10;- 주요 사업 분야&#10;- 특징 및 강점&#10;- 제공 서비스 등" />
               </InputGroup>
               <InputGroup>
                 <Label>사업장 주소 *</Label>
-                <Input 
-                  name="address" 
-                  placeholder="정확한 사업장 주소를 입력해주세요" 
-                  value={form.address}
-                  onChange={handleChange} 
-                  required 
-                />
+                <Input name="address" value={form.address} onChange={handleChange} required placeholder="정확한 사업장 주소를 입력해주세요" />
               </InputGroup>
             </FormSection>
 
+            {/* 연락처 */}
             <FormSection delay="0.4s">
               <SectionTitle>📞 연락처 정보</SectionTitle>
               <InputGroup>
                 <Label>연락처 *</Label>
-                <Input 
-                  name="phone_number" 
-                  placeholder="010-0000-0000" 
-                  value={form.phone_number}
-                  onChange={handleChange} 
-                  required 
-                />
+                <Input name="phone_number" value={form.phone_number} onChange={handleChange} required placeholder="010-0000-0000" />
               </InputGroup>
               <InputGroup>
                 <Label>연락 가능 시간 *</Label>
-                <Input 
-                  name="available_time" 
-                  placeholder="예: 평일 09:00-18:00, 주말 가능" 
-                  value={form.available_time}
-                  onChange={handleChange} 
-                  required 
-                />
+                <Input name="available_time" value={form.available_time} onChange={handleChange} required placeholder="예: 평일 09:00-18:00, 주말 가능" />
               </InputGroup>
             </FormSection>
 
+            {/* 카테고리 선택 */}
             <FormSection delay="0.5s">
               <SectionTitle>🤝 제휴 희망 분야</SectionTitle>
               <CategoryContainer>
@@ -764,8 +727,8 @@ function PostCreate() {
                   <CategoryButton
                     type="button"
                     key={cat.id}
-                    selected={selectedCategories.includes(cat.name)}
-                    onClick={() => toggleCategory(cat.name)}
+                    selected={selectedCategories.includes(cat.id)}
+                    onClick={() => toggleCategory(cat.id)}
                   >
                     {cat.name}
                   </CategoryButton>
@@ -773,24 +736,24 @@ function PostCreate() {
               </CategoryContainer>
             </FormSection>
 
+            {/* 메시지 */}
             <FormSection delay="0.6s">
               <SectionTitle>💬 추가 메시지</SectionTitle>
               <InputGroup>
                 <Label>하고 싶은 말 (선택사항)</Label>
-                <TextArea 
-                  name="extra_message" 
-                  placeholder="제휴를 희망하는 파트너에게 전하고 싶은 메시지가 있다면 자유롭게 작성해주세요"
+                <TextArea
+                  name="extra_message"
                   value={form.extra_message}
-                  onChange={handleChange} 
+                  onChange={handleChange}
+                  placeholder="제휴를 희망하는 파트너에게 전하고 싶은 메시지가 있다면 자유롭게 작성해주세요"
                   style={{ minHeight: '100px' }}
                 />
               </InputGroup>
             </FormSection>
 
+            {/* 버튼 */}
             <SubmitButtonContainer>
-              <CancelButton type="button" onClick={handleCancel}>
-                취소
-              </CancelButton>
+              <CancelButton type="button" onClick={handleCancel}>취소</CancelButton>
               <SubmitButton type="submit" disabled={isSubmitting}>
                 {isSubmitting && <LoadingSpinner />}
                 {isSubmitting ? '게시글 등록 중...' : '게시글 등록하기'}
