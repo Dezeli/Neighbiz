@@ -8,7 +8,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('users.urls')),
     path('api/v1/posts/', include('posts.urls')),
-    
+    path('api/v1/stores/', include('stores.urls')),
+
     # React SPA를 위한 fallback 경로 (라우팅 문제 방지용)
     re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
