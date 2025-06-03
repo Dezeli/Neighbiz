@@ -519,7 +519,6 @@ const ErrorButton = styled.button`
   }
 `;
 
-// Skeleton Loading Components
 const SkeletonBox = styled.div`
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -538,20 +537,30 @@ function PostDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    api.get(`/posts/${id}/`)
-      .then(res => {
+    const init = async () => {
+      try {
+        await api.get('/stores/me/');
+      } catch (err) {
+        navigate('/store/create');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const res = await api.get(`/posts/${id}/`);
         setPost(res.data.data);
         setError(null);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('게시글 불러오기 실패:', err);
         setError('존재하지 않는 게시글이거나 오류가 발생했습니다.');
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
-  }, [id]);
+      }
+    };
+
+    init();
+  }, [id, navigate]);
+
 
   if (error) {
     return (

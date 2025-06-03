@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Post, PostImage, PartnershipCategory
 
-
 class PartnershipCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PartnershipCategory
@@ -78,3 +77,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'author', 'created_at', 'is_active'
         ]
         read_only_fields = ['id', 'created_at', 'is_active', 'author']
+
+class PostListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'created_at']

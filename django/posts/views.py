@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
-
 from .models import Post, PartnershipCategory, PostImage
 from .serializers import (
     PostSerializer,
+    PostListSerializer,
     PostDetailSerializer,
     PartnershipCategorySerializer
 )
@@ -16,7 +16,6 @@ from django.conf import settings
 import boto3
 import uuid
 from botocore.exceptions import ClientError
-
 
 class PostListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -96,3 +95,12 @@ class PostImageUploadPresignedURLView(APIView):
             "upload_url": presigned_url,
             "image_url": final_image_url
         })
+
+class MyPostListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        posts = Post.objects.filter(author=user).order_by('-created_at')
+        serializer = PostListSerializer(posts, many=True)
+        return success_response(message="게시글 목록을 성공적으로 불러왔습니다.", data=serializer.data)

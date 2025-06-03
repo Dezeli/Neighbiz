@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../utils/api';
+import api from '../lib/axios';
 
 function StoreCreate() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ function StoreCreate() {
     e.preventDefault();
     try {
       await api.post('/stores/', form);
-      navigate('/main');  // 또는 /mypage
+      navigate('/main');  // 또는 '/mypage'
     } catch (err) {
       setError(err.response?.data?.message || '가게 등록에 실패했습니다.');
     }
