@@ -4,6 +4,7 @@ import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import api from '../lib/axios';
 import defaultImage from '../assets/image.PNG';
 
+
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
   
@@ -711,23 +712,26 @@ function Main() {
   };
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const init = async () => {
       try {
-        setLoading(true);
-        const res = await api.get('/posts/');
-        setPosts(res.data.data);
+        await api.get('/stores/me/');
+      } catch (err) {
+        navigate('/store/create');
+        return;
+      }
+
+      try {
+        const postRes = await api.get('/posts/');
+        setPosts(postRes.data.data);
       } catch (err) {
         console.error('게시글 불러오기 실패:', err);
       } finally {
         setLoading(false);
       }
-    };
 
-    const fetchCategories = async () => {
       try {
-        setCategoriesLoading(true);
-        const res = await api.get('/posts/categories/');
-        setCategories(res.data.data);
+        const catRes = await api.get('/posts/categories/');
+        setCategories(catRes.data.data);
       } catch (err) {
         console.error('카테고리 불러오기 실패:', err);
       } finally {
@@ -735,9 +739,8 @@ function Main() {
       }
     };
 
-    fetchPosts();
-    fetchCategories();
-  }, []);
+    init();
+  }, [navigate]);
 
   const toggleCategory = (categoryName) => {
     setSelectedCategories(prev =>

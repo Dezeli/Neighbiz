@@ -8,6 +8,8 @@ import PostDetail from './pages/PostDetail';
 import FindID from './pages/FindID';
 import ResetPassword from './pages/ResetPassword';
 import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
+import StoreCreate from './pages/StoreCreate';
+import MyPage from './pages/MyPage';
 import useAuthCheck from './hooks/useAuthCheck';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -48,6 +50,22 @@ function App() {
           element={
             <ProtectedRoute>
               <PostDetail user={user} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/store/create"
+          element={
+            <ProtectedRoute>
+              <StoreCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mypage"
+          element={
+            <ProtectedRoute>
+              <MyPage />
             </ProtectedRoute>
           }
         />

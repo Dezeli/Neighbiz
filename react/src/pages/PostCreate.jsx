@@ -538,6 +538,7 @@ function PostCreate() {
   const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedStoreCategories, setSelectedStoreCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     title: '',
@@ -550,10 +551,23 @@ function PostCreate() {
   });
 
   useEffect(() => {
-    api.get('/posts/categories/')
-      .then(res => setCategories(res.data.data))
-      .catch(err => console.error('카테고리 불러오기 실패:', err));
-  }, []);
+    const init = async () => {
+      try {
+        await api.get('/stores/me/');
+      } catch (err) {
+        navigate('/store/create');
+        return;
+      }
+
+      try {
+        const res = await api.get('/posts/categories/');
+        setCategories(res.data.data);
+      } catch (err) {
+        console.error('카테고리 불러오기 실패:', err);
+      }
+    };
+    init();
+  }, [navigate]);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 5);
@@ -564,9 +578,13 @@ function PostCreate() {
 
   const toggleCategory = (catId) => {
     setSelectedCategories(prev =>
-      prev.includes(catId)
-        ? prev.filter(id => id !== catId)
-        : [...prev, catId]
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
+    );
+  };
+
+  const toggleStoreCategory = (catId) => {
+    setSelectedStoreCategories(prev =>
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
     );
   };
 
@@ -590,6 +608,11 @@ function PostCreate() {
 
     if (selectedCategories.length === 0) {
       alert('제휴 카테고리를 최소 1개 이상 선택해주세요.');
+      return;
+    }
+
+    if (selectedStoreCategories.length === 0) {
+      alert('사업장 카테고리를 최소 1개 이상 선택해주세요.');
       return;
     }
 
@@ -620,16 +643,15 @@ function PostCreate() {
         )
       );
 
-      // 이미지 데이터 구성 (첫 번째 이미지를 썸네일로 지정)
       const imageData = uploadLinks.map((link, index) => ({
         image_url: link.image_url,
         is_thumbnail: index === 0,
       }));
 
-      // 게시글 업로드
       await api.post('/posts/', {
         ...form,
         images: imageData,
+        store_categories: selectedStoreCategories,
         partnership_categories: selectedCategories,
       });
 
@@ -664,11 +686,11 @@ function PostCreate() {
               <SectionTitle>📝 기본 정보</SectionTitle>
               <InputGroup>
                 <Label>게시글 제목 *</Label>
-                <Input name="title" value={form.title} onChange={handleChange} required placeholder="매력적인 제목을 입력해주세요" />
+                <Input name="title" value={form.title} onChange={handleChange} required />
               </InputGroup>
               <InputGroup>
                 <Label>사업장 이름 *</Label>
-                <Input name="store_name" value={form.store_name} onChange={handleChange} required placeholder="사업장 또는 브랜드명을 입력해주세요" />
+                <Input name="store_name" value={form.store_name} onChange={handleChange} required />
               </InputGroup>
             </FormSection>
 
@@ -698,11 +720,11 @@ function PostCreate() {
               <SectionTitle>📋 상세 정보</SectionTitle>
               <InputGroup>
                 <Label>사업장 소개 *</Label>
-                <TextArea name="description" value={form.description} onChange={handleChange} required placeholder="사업장에 대한 자세한 소개를 작성해주세요&#10;- 주요 사업 분야&#10;- 특징 및 강점&#10;- 제공 서비스 등" />
+                <TextArea name="description" value={form.description} onChange={handleChange} required />
               </InputGroup>
               <InputGroup>
                 <Label>사업장 주소 *</Label>
-                <Input name="address" value={form.address} onChange={handleChange} required placeholder="정확한 사업장 주소를 입력해주세요" />
+                <Input name="address" value={form.address} onChange={handleChange} required />
               </InputGroup>
             </FormSection>
 
@@ -711,22 +733,39 @@ function PostCreate() {
               <SectionTitle>📞 연락처 정보</SectionTitle>
               <InputGroup>
                 <Label>연락처 *</Label>
-                <Input name="phone_number" value={form.phone_number} onChange={handleChange} required placeholder="010-0000-0000" />
+                <Input name="phone_number" value={form.phone_number} onChange={handleChange} required />
               </InputGroup>
               <InputGroup>
                 <Label>연락 가능 시간 *</Label>
-                <Input name="available_time" value={form.available_time} onChange={handleChange} required placeholder="예: 평일 09:00-18:00, 주말 가능" />
+                <Input name="available_time" value={form.available_time} onChange={handleChange} required />
               </InputGroup>
             </FormSection>
 
-            {/* 카테고리 선택 */}
+            {/* 사업장 카테고리 */}
+            <FormSection delay="0.45s">
+              <SectionTitle>🏷️ 사업장 카테고리</SectionTitle>
+              <CategoryContainer>
+                {categories.map((cat) => (
+                  <CategoryButton
+                    type="button"
+                    key={`store-${cat.id}`}
+                    selected={selectedStoreCategories.includes(cat.id)}
+                    onClick={() => toggleStoreCategory(cat.id)}
+                  >
+                    {cat.name}
+                  </CategoryButton>
+                ))}
+              </CategoryContainer>
+            </FormSection>
+
+            {/* 제휴 희망 카테고리 */}
             <FormSection delay="0.5s">
               <SectionTitle>🤝 제휴 희망 분야</SectionTitle>
               <CategoryContainer>
                 {categories.map((cat) => (
                   <CategoryButton
                     type="button"
-                    key={cat.id}
+                    key={`partnership-${cat.id}`}
                     selected={selectedCategories.includes(cat.id)}
                     onClick={() => toggleCategory(cat.id)}
                   >
@@ -736,7 +775,7 @@ function PostCreate() {
               </CategoryContainer>
             </FormSection>
 
-            {/* 메시지 */}
+            {/* 추가 메시지 */}
             <FormSection delay="0.6s">
               <SectionTitle>💬 추가 메시지</SectionTitle>
               <InputGroup>
