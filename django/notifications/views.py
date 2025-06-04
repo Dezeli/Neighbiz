@@ -5,8 +5,8 @@ from .serializers import PartnerRequestSerializer, NotificationSerializer
 from rest_framework import status, views
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-
 from utils.response import success_response
+from rest_framework.views import APIView
 
 
 
@@ -15,12 +15,13 @@ class PartnerRequestCreateView(generics.CreateAPIView):
     serializer_class = PartnerRequestSerializer
     permission_classes = [IsAuthenticated]
 
-class NotificationListView(generics.ListAPIView):
-    serializer_class = NotificationSerializer
+class NotificationListView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return success_response("알림 목록을 불러왔습니다.", serializer.data)
 
 class NotificationReadView(views.APIView):
     permission_classes = [IsAuthenticated]
