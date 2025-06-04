@@ -724,7 +724,7 @@ Authorization: Bearer <access_token>
   "data": [
     {
       "id": 1,
-      "sender_username": "minhyeok",
+      "sender_username": "철수",
       "message": "안녕하세요, 제휴 제안드립니다.",
       "post": 3,
       "is_read": false,
