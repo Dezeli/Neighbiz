@@ -1,0 +1,8 @@
+site_name: Neighviz API 문서
+theme:
+  name: material
+
+nav:
+  - 홈: index.md
+  - 인증:
+      - 회원가입: auth/signup.md
