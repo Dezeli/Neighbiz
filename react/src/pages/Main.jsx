@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import api from '../lib/axios';
@@ -699,7 +699,11 @@ function Main() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -710,6 +714,47 @@ function Main() {
   const handleWrite = () => {
     navigate('/post/create');
   };
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/notifications/');
+      setNotifications(res.data.data);
+    } catch (err) {
+      console.error('알림 목록 불러오기 실패:', err);
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await api.get('/notifications/unread-count/');
+      setUnreadCount(res.data.data.unread_count);
+    } catch (err) {
+      console.error('알림 개수 불러오기 실패:', err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await api.patch(`/notifications/${id}/read/`);
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('알림 읽음 처리 실패:', err);
+    }
+  };
+
+  const handleClickOutside = (e) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -737,6 +782,8 @@ function Main() {
       } finally {
         setCategoriesLoading(false);
       }
+
+      fetchUnreadCount();
     };
 
     init();
@@ -781,6 +828,52 @@ function Main() {
                 Neigh<span>viz</span>
               </Logo>
               <HeaderActions>
+                <div style={{ position: 'relative', marginRight: '12px' }}>
+                  <button onClick={() => {
+                    fetchNotifications();
+                    setShowDropdown(!showDropdown);
+                  }}>
+                    🔔
+                    {unreadCount > 0 && <span style={{ color: 'red', marginLeft: 4 }}>!</span>}
+                  </button>
+                  {showDropdown && (
+                    <div ref={dropdownRef} style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      background: '#fff',
+                      border: '1px solid #ddd',
+                      padding: '12px',
+                      width: '280px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      zIndex: 1000
+                    }}>
+                      <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>알림</p>
+                      {notifications.length === 0 ? (
+                        <p>알림이 없습니다.</p>
+                      ) : (
+                        notifications.map(n => (
+                          <div
+                            key={n.id}
+                            style={{
+                              fontWeight: n.is_read ? 'normal' : 'bold',
+                              marginBottom: '10px',
+                              cursor: 'pointer'
+                            }}
+                            onMouseEnter={() => !n.is_read && markAsRead(n.id)}
+                            onClick={() => navigate(`/post/${n.post}`)}
+                          >
+                            <div>{n.sender_username}님의 제안: {n.message}</div>
+                            <div style={{ fontSize: '0.8rem', color: '#888' }}>
+                              {new Date(n.created_at).toLocaleString()}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
                 <WriteButton onClick={handleWrite}>
                   ✏️ 제휴 글쓰기
                 </WriteButton>

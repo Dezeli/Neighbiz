@@ -9,6 +9,8 @@ urlpatterns = [
     path('api/v1/auth/', include('users.urls')),
     path('api/v1/posts/', include('posts.urls')),
     path('api/v1/stores/', include('stores.urls')),
+    path('api/v1/notifications/', include('notifications.urls')),
+
 
     re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
