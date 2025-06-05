@@ -536,6 +536,10 @@ function PostDetail() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [partnerMessage, setPartnerMessage] = useState('');
+  const [partnerError, setPartnerError] = useState('');
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -561,6 +565,26 @@ function PostDetail() {
     init();
   }, [id, navigate]);
 
+  const handlePartnerRequest = async () => {
+    if (!partnerMessage.trim()) {
+      setPartnerError('메시지를 입력해주세요.');
+      return;
+    }
+
+    try {
+      await api.post('/notifications/partner-request/', {
+        post: post.id,
+        message: partnerMessage,
+      });
+
+      alert('제휴 요청이 전송되었습니다.');
+      setIsModalOpen(false);
+      setPartnerMessage('');
+      setPartnerError('');
+    } catch (err) {
+      setPartnerError(err.response?.data?.message || '오류가 발생했습니다.');
+    }
+  };
 
   if (error) {
     return (
@@ -602,7 +626,6 @@ function PostDetail() {
       <GlobalStyle />
       <Container>
         <ContentWrapper>
-          {/* Header Section */}
           <HeaderSection>
             <BackButton onClick={() => navigate('/main')}>
               목록으로 돌아가기
@@ -615,7 +638,6 @@ function PostDetail() {
             </PostMeta>
           </HeaderSection>
 
-          {/* Images Section */}
           <ContentSection delay="0.1s">
             <SectionTitle>매장 이미지</SectionTitle>
             <SectionContent>
@@ -638,7 +660,6 @@ function PostDetail() {
             </SectionContent>
           </ContentSection>
 
-          {/* Store Information */}
           <ContentSection delay="0.2s">
             <SectionTitle>가게 정보</SectionTitle>
             <SectionContent>
@@ -663,13 +684,12 @@ function PostDetail() {
             </SectionContent>
           </ContentSection>
 
-          {/* Store Description */}
           <ContentSection delay="0.3s">
             <SectionTitle>가게 소개</SectionTitle>
             <SectionContent>
-              <p style={{ 
-                fontSize: '1.1rem', 
-                lineHeight: '1.8', 
+              <p style={{
+                fontSize: '1.1rem',
+                lineHeight: '1.8',
                 color: '#374151',
                 whiteSpace: 'pre-line'
               }}>
@@ -678,7 +698,6 @@ function PostDetail() {
             </SectionContent>
           </ContentSection>
 
-          {/* Partnership Categories */}
           <ContentSection delay="0.4s">
             <SectionTitle>제휴 희망 카테고리</SectionTitle>
             <SectionContent>
@@ -692,7 +711,6 @@ function PostDetail() {
             </SectionContent>
           </ContentSection>
 
-          {/* Extra Message */}
           {post.extra_message && (
             <ContentSection delay="0.5s">
               <SectionTitle>사업주의 한마디</SectionTitle>
@@ -704,8 +722,7 @@ function PostDetail() {
             </ContentSection>
           )}
 
-          {/* Action Section */}
-          <ContentSection delay="0.6s" style={{ textAlign: 'center', background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)' }}>
+          <ContentSection delay="0.6s" style={{ textAlign: 'center' }}>
             <SectionTitle style={{ justifyContent: 'center' }}>문의하기</SectionTitle>
             <SectionContent>
               <p style={{ marginBottom: '24px', fontSize: '1.1rem', color: '#64748b' }}>
@@ -723,6 +740,29 @@ function PostDetail() {
               </InfoGrid>
             </SectionContent>
           </ContentSection>
+
+          <ContentSection delay="0.7s" style={{ textAlign: 'center' }}>
+            <button onClick={() => setIsModalOpen(true)}>
+              제휴 맺어요
+            </button>
+          </ContentSection>
+
+          {isModalOpen && (
+            <div className="modal">
+              <div className="modal-content">
+                <h3>제휴 요청 메시지</h3>
+                <textarea
+                  value={partnerMessage}
+                  onChange={(e) => setPartnerMessage(e.target.value)}
+                />
+                {partnerError && <p>{partnerError}</p>}
+                <div>
+                  <button onClick={() => setIsModalOpen(false)}>취소</button>
+                  <button onClick={handlePartnerRequest}>보내기</button>
+                </div>
+              </div>
+            </div>
+          )}
         </ContentWrapper>
       </Container>
     </>

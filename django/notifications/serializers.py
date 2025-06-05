@@ -22,6 +22,7 @@ class PartnerRequestSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context['request']
         post = validated_data['post']
+        message = validated_data['message']
 
         partner_request = PartnerRequest.objects.create(
             sender=request.user,
@@ -32,14 +33,14 @@ class PartnerRequestSerializer(serializers.ModelSerializer):
             user=post.author,
             sender=request.user,
             post=post,
-            message=f"{request.user.username}님이 제휴 요청을 보냈습니다."
+            message=message
         )
 
         return partner_request
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    sender_username = serializers.CharField(source='sender.name', read_only=True)
     request_message = serializers.SerializerMethodField()
 
     class Meta:
@@ -52,3 +53,19 @@ class NotificationSerializer(serializers.ModelSerializer):
             return partner_request.message
         except PartnerRequest.DoesNotExist:
             return None
+
+
+class SentPartnerRequestSerializer(serializers.ModelSerializer):
+    post_title = serializers.CharField(source='post.title', read_only=True)
+    post_thumbnail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PartnerRequest
+        fields = ['id', 'post', 'post_title', 'post_thumbnail', 'message', 'created_at']
+
+    def get_post_thumbnail(self, obj):
+        thumbnail = obj.post.images.filter(is_thumbnail=True).first()
+        if thumbnail:
+            return thumbnail.image_url
+        fallback = obj.post.images.first()
+        return fallback.image_url if fallback else None

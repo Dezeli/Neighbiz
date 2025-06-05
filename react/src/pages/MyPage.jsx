@@ -7,6 +7,7 @@ function MyPage() {
   const [store, setStore] = useState(null);
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -23,16 +24,22 @@ function MyPage() {
       }
 
       try {
-        const [storeRes, postsRes, categoryRes] = await Promise.all([
+        const [storeRes, postsRes, categoryRes, notiRes] = await Promise.all([
           api.get('/stores/me/'),
           api.get('/posts/myposts/'),
-          api.get('/posts/categories/')
+          api.get('/posts/categories/'),
+          api.get('/notifications/mypage/')
         ]);
 
         if (isMounted) {
           setStore(storeRes.data.data);
           setPosts(Array.isArray(postsRes.data.data) ? postsRes.data.data : []);
           setCategories(Array.isArray(categoryRes.data.data) ? categoryRes.data.data : []);
+          setSentRequests(
+            Array.isArray(notiRes.data.data?.sent_requests)
+              ? notiRes.data.data.sent_requests
+              : []
+          );
         }
       } catch (err) {
         if (isMounted) {
@@ -99,11 +106,31 @@ function MyPage() {
         )}
       </section>
 
+      {/* 제휴 요청한 가게 */}
       <section>
         <h2 className="text-xl font-bold mb-2">제휴 요청한 가게</h2>
-        <p className="text-gray-400">아직 기능 준비 중입니다.</p>
+        {sentRequests.length === 0 ? (
+          <p className="text-gray-500">아직 보낸 제휴 요청이 없습니다.</p>
+        ) : (
+          <ul className="space-y-3">
+            {sentRequests.map(req => (
+              <li
+                key={req.id}
+                onClick={() => navigate(`/post/${req.post}`)}
+                className="cursor-pointer p-3 border rounded hover:bg-gray-50"
+              >
+                <p className="font-semibold">{req.post_title}</p>
+                <p className="text-gray-600 text-sm mt-1">"{req.message}"</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  보낸 날짜: {new Date(req.created_at).toLocaleString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
+      {/* 글 작성하기 버튼 */}
       <div className="text-right">
         <button
           onClick={() => navigate('/post/create')}
