@@ -2,8 +2,11 @@ from django.db import models
 from users.models import User
 from posts.models import PartnershipCategory
 
+
 class Store(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='store')  # 1:1
+    owner = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="store"
+    )  # 1:1
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     address = models.CharField(max_length=255)

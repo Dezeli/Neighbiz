@@ -2,14 +2,13 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User, UserImage, EmailVerification
+from users.models import UserImage, EmailVerification
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
-from django.core.cache import cache
 from django.conf import settings
 
 import random
@@ -27,10 +26,10 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'name', 'email', 'phone_number', 'password', 'image_url']
+        fields = ["username", "name", "email", "phone_number", "password", "image_url"]
         extra_kwargs = {
-            'password': {'write_only': True},
-            'username': {'validators': []},
+            "password": {"write_only": True},
+            "username": {"validators": []},
         }
 
     def validate_username(self, value):
@@ -41,15 +40,12 @@ class SignupSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         valid_time = timezone.now() - timedelta(minutes=10)
 
-        try:
-            record = EmailVerification.objects.filter(
-                email=value,
-                is_verified=True,
-                created_at__gte=valid_time
-            ).latest('created_at')
-        except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError("이메일 인증이 완료되지 않았거나 만료되었습니다.")
-
+        if not EmailVerification.objects.filter(
+            email=value, is_verified=True, created_at__gte=valid_time
+        ).exists():
+            raise serializers.ValidationError(
+                "이메일 인증이 완료되지 않았거나 만료되었습니다."
+            )
         return value
 
     def validate_phone_number(self, value):
@@ -61,7 +57,7 @@ class SignupSerializer(serializers.ModelSerializer):
         s3_key = self._extract_s3_key(value)
 
         s3 = boto3.client(
-            's3',
+            "s3",
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name=settings.AWS_S3_REGION_NAME,
@@ -69,19 +65,22 @@ class SignupSerializer(serializers.ModelSerializer):
 
         try:
             response = s3.head_object(
-                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                Key=s3_key
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_key
             )
         except ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                raise serializers.ValidationError("S3에 해당 이미지가 존재하지 않습니다.")
+            if e.response["Error"]["Code"] == "404":
+                raise serializers.ValidationError(
+                    "S3에 해당 이미지가 존재하지 않습니다."
+                )
             raise serializers.ValidationError("S3 검증 중 오류가 발생했습니다.")
 
         size = response.get("ContentLength", 0)
         content_type = response.get("ContentType", "")
 
         if content_type not in ["image/jpeg", "image/png"]:
-            raise serializers.ValidationError("이미지 형식은 JPEG 또는 PNG만 허용됩니다.")
+            raise serializers.ValidationError(
+                "이미지 형식은 JPEG 또는 PNG만 허용됩니다."
+            )
 
         if size > 5 * 1024 * 1024:
             raise serializers.ValidationError("이미지 크기는 5MB를 초과할 수 없습니다.")
@@ -93,21 +92,20 @@ class SignupSerializer(serializers.ModelSerializer):
         return parsed.path.lstrip("/")
 
     def create(self, validated_data):
-        image_url = validated_data.pop('image_url')
+        image_url = validated_data.pop("image_url")
         user = User.objects.create_user(**validated_data)
         UserImage.objects.create(user=user, image_url=image_url)
         EmailVerification.objects.filter(email=user.email).delete()
         return user
 
 
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username'] = user.username
-        token['role'] = user.role
-        token['is_verified'] = user.is_verified
+        token["username"] = user.username
+        token["role"] = user.role
+        token["is_verified"] = user.is_verified
         return token
 
     def validate(self, attrs):
@@ -115,11 +113,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             data = super().validate(attrs)
         except AuthenticationFailed:
             raise AuthenticationFailed("아이디 또는 비밀번호가 올바르지 않습니다.")
-        data['username'] = self.user.username
-        data['role'] = self.user.role
-        data['is_verified'] = self.user.is_verified
+        data["username"] = self.user.username
+        data["role"] = self.user.role
+        data["is_verified"] = self.user.is_verified
         return data
-    
+
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -152,8 +151,9 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             message=message.strip(),
             from_email=config("DEFAULT_FROM_EMAIL"),
             recipient_list=[user.email],
-            fail_silently=False
+            fail_silently=False,
         )
+
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
@@ -161,9 +161,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        uid = attrs.get('uid')
-        token = attrs.get('token')
-        new_password = attrs.get('new_password')
+        uid = attrs.get("uid")
+        token = attrs.get("token")
+        new_password = attrs.get("new_password")
 
         try:
             uid = force_str(urlsafe_base64_decode(uid))
@@ -180,8 +180,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return attrs
 
     def save(self):
-        self.user.set_password(self.validated_data['new_password'])
+        self.user.set_password(self.validated_data["new_password"])
         self.user.save()
+
 
 class PasswordResetTokenValidateSerializer(serializers.Serializer):
     uid = serializers.CharField()
@@ -201,7 +202,8 @@ class PasswordResetTokenValidateSerializer(serializers.Serializer):
             raise serializers.ValidationError("만료되었거나 유효하지 않은 토큰입니다.")
 
         return attrs
-    
+
+
 class FindIDSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone_number = serializers.CharField()
@@ -233,12 +235,13 @@ class EmailVerificationSendSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         from users.models import User
+
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("이미 가입된 이메일입니다.")
         return value
 
     def save(self):
-        email = self.validated_data['email']
+        email = self.validated_data["email"]
         code = self._generate_code()
 
         EmailVerification.objects.filter(email=email).delete()
@@ -265,9 +268,9 @@ class EmailVerificationSendSerializer(serializers.Serializer):
                 message=message,
                 from_email=config("DEFAULT_FROM_EMAIL"),
                 recipient_list=[email],
-                fail_silently=False
+                fail_silently=False,
             )
-        except Exception as e:
+        except Exception:
             raise serializers.ValidationError("이메일 전송 중 오류가 발생했습니다.")
 
     def _generate_code(self):
@@ -303,6 +306,7 @@ class EmailVerificationConfirmSerializer(serializers.Serializer):
         self.record.is_verified = True
         self.record.save()
 
+
 class PresignedURLRequestSerializer(serializers.Serializer):
     filename = serializers.CharField()
     content_type = serializers.CharField()
@@ -312,10 +316,10 @@ class UserMeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id',
-            'username',
-            'name',
-            'email',
-            'role',
-            'is_verified',
+            "id",
+            "username",
+            "name",
+            "email",
+            "role",
+            "is_verified",
         ]

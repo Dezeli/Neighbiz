@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 
+
 class PartnershipCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -16,8 +17,12 @@ class Post(models.Model):
     phone_number = models.CharField(max_length=20)
     available_time = models.CharField(max_length=100)
 
-    store_categories = models.ManyToManyField(PartnershipCategory, related_name='store_posts')
-    partnership_categories = models.ManyToManyField(PartnershipCategory, related_name='partner_posts')
+    store_categories = models.ManyToManyField(
+        PartnershipCategory, related_name="store_posts"
+    )
+    partnership_categories = models.ManyToManyField(
+        PartnershipCategory, related_name="partner_posts"
+    )
 
     extra_message = models.TextField(blank=True)
 
@@ -30,7 +35,7 @@ class Post(models.Model):
 
 
 class PostImage(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
     image_url = models.URLField()
     is_thumbnail = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
