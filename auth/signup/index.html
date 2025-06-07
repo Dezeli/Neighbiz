@@ -9,8 +9,10 @@
       
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../">
       
+      
+        <link rel="next" href="../login/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -197,7 +199,7 @@
   
   
   <span class="md-ellipsis">
-    홈
+    🛂 Neighviz API 문서 (MVP)
     
   </span>
   
@@ -232,7 +234,7 @@
   
   
   <span class="md-ellipsis">
-    인증
+    auth API
     
   </span>
   
@@ -243,9 +245,32 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            인증
+            auth API
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    소개
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -304,20 +329,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#post-authsignup" class="md-nav__link">
     <span class="md-ellipsis">
-      요청 예시
+      ✅ POST /auth/signup/
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ POST /auth/signup/">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#response-201" class="md-nav__link">
     <span class="md-ellipsis">
-      응답 예시
+      Response 201 (성공)
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-400" class="md-nav__link">
+    <span class="md-ellipsis">
+      Response 400 (실패 예시)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -325,6 +374,670 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../login/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    로그인
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../token_refresh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    토큰 갱신
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../email_send/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    이메일 인증 전송
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../email_confirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    이메일 인증 확인
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reset_password_request/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    비밀번호 재설정 요청
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reset_password_validate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    비밀번호 링크 확인
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reset_password_confirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    비밀번호 재설정 완료
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../find_id/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    아이디 찾기
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../me/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    내 정보 조회
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    posts API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            posts API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../posts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    소개
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../posts/create/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    게시글 작성
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../posts/detail/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    게시글 상세 조회
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../posts/categories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    카테고리 목록
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../posts/image_upload/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    이미지 업로드
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    stores API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            stores API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    소개
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stores/create/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    가게 등록
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stores/me/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    내 가게 정보
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stores/mypage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    마이페이지 정보
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    notifications API
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            notifications API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    소개
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/partner_request/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    제휴 요청
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    알림 목록
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/mark_read/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    읽음 처리
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/unread_count/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    안 읽은 알림 수
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -364,20 +1077,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#post-authsignup" class="md-nav__link">
     <span class="md-ellipsis">
-      요청 예시
+      ✅ POST /auth/signup/
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="✅ POST /auth/signup/">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#response-201" class="md-nav__link">
     <span class="md-ellipsis">
-      응답 예시
+      Response 201 (성공)
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-400" class="md-nav__link">
+    <span class="md-ellipsis">
+      Response 400 (실패 예시)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -397,20 +1134,34 @@
 
 
 
-<h1 id="api">🔐 회원가입 API</h1>
-<p><strong>POST /api/v1/auth/signup/</strong></p>
-<p>이 API는 이메일과 비밀번호로 회원가입을 처리합니다.</p>
-<h2 id="_1">요청 예시</h2>
+<h1 id="api">회원가입 API</h1>
+<h2 id="post-authsignup">✅ POST <code>/auth/signup/</code></h2>
+<p>이메일 인증 후 사용자 회원가입을 진행합니다.</p>
+<h3 id="request">Request</h3>
 <pre><code class="language-json">{
-  &quot;email&quot;: &quot;test@example.com&quot;,
-  &quot;password&quot;: &quot;securepassword&quot;
+  &quot;username&quot;: &quot;exampleuser&quot;,
+  &quot;name&quot;: &quot;홍길동&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;phone_number&quot;: &quot;01012345678&quot;,
+  &quot;password&quot;: &quot;password123&quot;,
+  &quot;image_url&quot;: &quot;https://bucket.s3.amazonaws.com/auth/images/abc.jpg&quot;
 }
 </code></pre>
-<h2 id="_2">응답 예시</h2>
+<h3 id="response-201">Response 201 (성공)</h3>
 <pre><code class="language-json">{
   &quot;success&quot;: true,
   &quot;message&quot;: &quot;회원가입 성공&quot;,
-  &quot;data&quot;: {}
+  &quot;data&quot;: null
+}
+</code></pre>
+<h3 id="response-400">Response 400 (실패 예시)</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;입력값 오류&quot;,
+  &quot;data&quot;: {
+    &quot;email&quot;: [&quot;이메일 인증이 완료되지 않았습니다.&quot;],
+    &quot;username&quot;: [&quot;이미 사용 중인 사용자명입니다.&quot;]
+  }
 }
 </code></pre>
 
