@@ -30,7 +30,7 @@ class SignupView(APIView):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return success_response("회원가입 성공", status=status.HTTP_201_CREATED)
+            return success_response("회원가입 성공", status_code=status.HTTP_201_CREATED)
         return error_response("입력값 오류", serializer.errors)
 
 
@@ -42,7 +42,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         try:
             serializer.is_valid(raise_exception=True)
         except AuthenticationFailed as e:
-            return error_response(str(e), status=status.HTTP_401_UNAUTHORIZED)
+            return error_response(str(e), status_code=status.HTTP_401_UNAUTHORIZED)
 
         return success_response("로그인에 성공했습니다.", serializer.validated_data)
 

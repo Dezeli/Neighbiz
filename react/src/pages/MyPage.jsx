@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../lib/axios';
 import { useNavigate } from 'react-router-dom';
+import { extractFirstError } from '../utils/error';
 
 function MyPage() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ function MyPage() {
         await api.get('/stores/me/');
       } catch (err) {
         if (isMounted) {
+          const msg = extractFirstError(err, '가게 정보 확인 중 오류가 발생했습니다.');
+          setError(msg);
           navigate('/store/create');
         }
         return;
@@ -28,22 +31,23 @@ function MyPage() {
           api.get('/stores/me/'),
           api.get('/posts/myposts/'),
           api.get('/posts/categories/'),
-          api.get('/notifications/mypage/')
+          api.get('/notifications/mypage/'),
         ]);
 
-        if (isMounted) {
-          setStore(storeRes.data.data);
-          setPosts(Array.isArray(postsRes.data.data) ? postsRes.data.data : []);
-          setCategories(Array.isArray(categoryRes.data.data) ? categoryRes.data.data : []);
-          setSentRequests(
-            Array.isArray(notiRes.data.data?.sent_requests)
-              ? notiRes.data.data.sent_requests
-              : []
-          );
-        }
+        if (!isMounted) return;
+
+        setStore(storeRes.data.data);
+        setPosts(Array.isArray(postsRes.data.data) ? postsRes.data.data : []);
+        setCategories(Array.isArray(categoryRes.data.data) ? categoryRes.data.data : []);
+        setSentRequests(
+          Array.isArray(notiRes.data.data?.sent_requests)
+            ? notiRes.data.data.sent_requests
+            : []
+        );
       } catch (err) {
         if (isMounted) {
-          setError(err.response?.data?.message || '마이페이지 정보를 불러오지 못했습니다.');
+          const msg = extractFirstError(err, '마이페이지 정보를 불러오는 중 오류가 발생했습니다.');
+          setError(msg);
         }
       }
     };
@@ -61,16 +65,15 @@ function MyPage() {
   };
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500 text-center mt-8">{error}</p>;
   }
 
   if (!store) {
-    return <p className="text-gray-600">가게 정보를 불러오는 중입니다...</p>;
+    return <p className="text-gray-600 text-center mt-8">가게 정보를 불러오는 중입니다...</p>;
   }
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      {/* 내 가게 정보 */}
       <section>
         <h2 className="text-xl font-bold mb-2">내 가게 정보</h2>
         <div className="border rounded p-4 bg-white">
@@ -83,7 +86,6 @@ function MyPage() {
         </div>
       </section>
 
-      {/* 내가 작성한 글 */}
       <section>
         <h2 className="text-xl font-bold mb-2">내가 작성한 글</h2>
         {posts.length === 0 ? (
@@ -106,7 +108,6 @@ function MyPage() {
         )}
       </section>
 
-      {/* 제휴 요청한 가게 */}
       <section>
         <h2 className="text-xl font-bold mb-2">제휴 요청한 가게</h2>
         {sentRequests.length === 0 ? (
@@ -130,7 +131,6 @@ function MyPage() {
         )}
       </section>
 
-      {/* 글 작성하기 버튼 */}
       <div className="text-right">
         <button
           onClick={() => navigate('/post/create')}

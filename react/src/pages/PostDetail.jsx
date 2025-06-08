@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import api from '../lib/axios';
 import defaultImage from '../assets/image.PNG';
+import { extractFirstError } from '../utils/error';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
@@ -556,7 +557,7 @@ function PostDetail() {
         setError(null);
       } catch (err) {
         console.error('게시글 불러오기 실패:', err);
-        setError('존재하지 않는 게시글이거나 오류가 발생했습니다.');
+        setError(extractFirstError(err, '존재하지 않는 게시글이거나 오류가 발생했습니다.'));
       } finally {
         setLoading(false);
       }
@@ -582,7 +583,7 @@ function PostDetail() {
       setPartnerMessage('');
       setPartnerError('');
     } catch (err) {
-      setPartnerError(err.response?.data?.message || '오류가 발생했습니다.');
+      setPartnerError(extractFirstError(err, '제휴 요청 중 오류가 발생했습니다.'));
     }
   };
 
@@ -642,10 +643,10 @@ function PostDetail() {
             <SectionTitle>매장 이미지</SectionTitle>
             <SectionContent>
               <ImagesGrid>
-                {(post.images.length > 0 ? post.images : [defaultImage]).map((url, i) => (
+                {(post.images.length > 0 ? post.images : [{ image_url: defaultImage }]).map((img, i) => (
                   <ImageCard key={i} index={i}>
                     <StyledImage
-                      src={url}
+                      src={img.image_url}
                       alt={`${post.store_name} 이미지 ${i + 1}`}
                       onError={(e) => {
                         e.target.src = defaultImage;
@@ -664,22 +665,10 @@ function PostDetail() {
             <SectionTitle>가게 정보</SectionTitle>
             <SectionContent>
               <InfoGrid>
-                <InfoCard index={0}>
-                  <InfoLabel>가게 이름</InfoLabel>
-                  <InfoValue>{post.store_name}</InfoValue>
-                </InfoCard>
-                <InfoCard index={1}>
-                  <InfoLabel>주소</InfoLabel>
-                  <InfoValue>{post.address}</InfoValue>
-                </InfoCard>
-                <InfoCard index={2}>
-                  <InfoLabel>전화번호</InfoLabel>
-                  <InfoValue>{post.phone_number}</InfoValue>
-                </InfoCard>
-                <InfoCard index={3}>
-                  <InfoLabel>연락 가능 시간</InfoLabel>
-                  <InfoValue>{post.available_time}</InfoValue>
-                </InfoCard>
+                <InfoCard index={0}><InfoLabel>가게 이름</InfoLabel><InfoValue>{post.store_name}</InfoValue></InfoCard>
+                <InfoCard index={1}><InfoLabel>주소</InfoLabel><InfoValue>{post.address}</InfoValue></InfoCard>
+                <InfoCard index={2}><InfoLabel>전화번호</InfoLabel><InfoValue>{post.phone_number}</InfoValue></InfoCard>
+                <InfoCard index={3}><InfoLabel>연락 가능 시간</InfoLabel><InfoValue>{post.available_time}</InfoValue></InfoCard>
               </InfoGrid>
             </SectionContent>
           </ContentSection>
@@ -687,14 +676,22 @@ function PostDetail() {
           <ContentSection delay="0.3s">
             <SectionTitle>가게 소개</SectionTitle>
             <SectionContent>
-              <p style={{
-                fontSize: '1.1rem',
-                lineHeight: '1.8',
-                color: '#374151',
-                whiteSpace: 'pre-line'
-              }}>
+              <p style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#374151', whiteSpace: 'pre-line' }}>
                 {post.description}
               </p>
+            </SectionContent>
+          </ContentSection>
+
+          <ContentSection delay="0.35s">
+            <SectionTitle>사업장 카테고리</SectionTitle>
+            <SectionContent>
+              <CategoriesList>
+                {post.store_categories.map((cat, i) => (
+                  <CategoryTag key={i} index={i} icon="🏷️">
+                    {cat.name}
+                  </CategoryTag>
+                ))}
+              </CategoriesList>
             </SectionContent>
           </ContentSection>
 
@@ -729,22 +726,14 @@ function PostDetail() {
                 이 매장과 제휴를 원하신다면 아래 연락처로 직접 문의해주세요.
               </p>
               <InfoGrid style={{ maxWidth: '600px', margin: '0 auto' }}>
-                <InfoCard>
-                  <InfoLabel>📞 전화 문의</InfoLabel>
-                  <InfoValue>{post.phone_number}</InfoValue>
-                </InfoCard>
-                <InfoCard>
-                  <InfoLabel>⏰ 연락 시간</InfoLabel>
-                  <InfoValue>{post.available_time}</InfoValue>
-                </InfoCard>
+                <InfoCard><InfoLabel>📞 전화 문의</InfoLabel><InfoValue>{post.phone_number}</InfoValue></InfoCard>
+                <InfoCard><InfoLabel>⏰ 연락 시간</InfoLabel><InfoValue>{post.available_time}</InfoValue></InfoCard>
               </InfoGrid>
             </SectionContent>
           </ContentSection>
 
           <ContentSection delay="0.7s" style={{ textAlign: 'center' }}>
-            <button onClick={() => setIsModalOpen(true)}>
-              제휴 맺어요
-            </button>
+            <button onClick={() => setIsModalOpen(true)}>제휴 맺어요</button>
           </ContentSection>
 
           {isModalOpen && (
@@ -755,7 +744,7 @@ function PostDetail() {
                   value={partnerMessage}
                   onChange={(e) => setPartnerMessage(e.target.value)}
                 />
-                {partnerError && <p>{partnerError}</p>}
+                {partnerError && <p style={{ color: 'red' }}>{partnerError}</p>}
                 <div>
                   <button onClick={() => setIsModalOpen(false)}>취소</button>
                   <button onClick={handlePartnerRequest}>보내기</button>

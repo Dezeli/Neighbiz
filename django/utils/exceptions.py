@@ -14,9 +14,9 @@ def custom_exception_handler(exc, context):
             else:
                 first_key = next(iter(original_data), None)
                 first_error = original_data[first_key][0] if first_key else None
-                message = first_error or "요청 처리 중 오류가 발생했습니다."
+                message = first_error or "오류가 발생했습니다."
         else:
-            message = "요청 처리 중 오류가 발생했습니다."
+            message = "오류가 발생했습니다."
 
         custom_response = {
             "success": False,
