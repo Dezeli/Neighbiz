@@ -1,0 +1,35 @@
+site_name: Neighviz API 문서
+theme:
+  name: material
+
+nav:
+  - 🛂 Neighviz API 문서 (MVP): index.md
+  - auth API:
+      - 소개: auth/index.md
+      - 회원가입: auth/signup.md
+      - 로그인: auth/login.md
+      - 토큰 갱신: auth/token_refresh.md
+      - 이메일 인증 전송: auth/email_send.md
+      - 이메일 인증 확인: auth/email_confirm.md
+      - 비밀번호 재설정 요청: auth/reset_password_request.md
+      - 비밀번호 링크 확인: auth/reset_password_validate.md
+      - 비밀번호 재설정 완료: auth/reset_password_confirm.md
+      - 아이디 찾기: auth/find_id.md
+      - 내 정보 조회: auth/me.md
+  - posts API:
+      - 소개: posts/index.md
+      - 게시글 작성: posts/create.md
+      - 게시글 상세 조회: posts/detail.md
+      - 카테고리 목록: posts/categories.md
+      - 이미지 업로드: posts/image_upload.md
+  - stores API:
+      - 소개: stores/index.md
+      - 가게 등록: stores/create.md
+      - 내 가게 정보: stores/me.md
+      - 마이페이지 정보: stores/mypage.md
+  - notifications API:
+      - 소개: notifications/index.md
+      - 제휴 요청: notifications/partner_request.md
+      - 알림 목록: notifications/list.md
+      - 읽음 처리: notifications/mark_read.md
+      - 안 읽은 알림 수: notifications/unread_count.md

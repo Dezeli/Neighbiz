@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
+import { extractFirstError } from '../utils/error';
 
 function StoreCreate() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function StoreCreate() {
   });
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     api.get('/posts/categories/')
@@ -40,11 +42,38 @@ function StoreCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!form.name.trim()) {
+      setError('상호명을 입력해주세요.');
+      return;
+    }
+    if (!form.address.trim()) {
+      setError('주소를 입력해주세요.');
+      return;
+    }
+    if (!form.phone_number.trim()) {
+      setError('매장 연락처를 입력해주세요.');
+      return;
+    }
+    if (!form.available_time.trim()) {
+      setError('연락 가능 시간을 입력해주세요.');
+      return;
+    }
+    if (form.categories.length === 0) {
+      setError('희망 제휴 카테고리를 1개 이상 선택해주세요.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
       await api.post('/stores/', form);
-      navigate('/main');  // 또는 '/mypage'
+      navigate('/main');
     } catch (err) {
-      setError(err.response?.data?.message || '가게 등록에 실패했습니다.');
+      setError(extractFirstError(err, '가게 등록에 실패했습니다.'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,11 +82,41 @@ function StoreCreate() {
       <h2 className="text-2xl font-bold mb-4">가게 정보 등록</h2>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="name" placeholder="상호명" value={form.name} onChange={handleChange} required />
-        <textarea name="description" placeholder="가게 소개" value={form.description} onChange={handleChange} />
-        <input name="address" placeholder="주소" value={form.address} onChange={handleChange} required />
-        <input name="phone_number" placeholder="매장 연락처" value={form.phone_number} onChange={handleChange} required />
-        <input name="available_time" placeholder="연락 가능 시간 (예: 10:00~18:00)" value={form.available_time} onChange={handleChange} required />
+        <input
+          name="name"
+          placeholder="상호명"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <textarea
+          name="description"
+          placeholder="가게 소개"
+          value={form.description}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          name="address"
+          placeholder="주소"
+          value={form.address}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          name="phone_number"
+          placeholder="매장 연락처"
+          value={form.phone_number}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          name="available_time"
+          placeholder="연락 가능 시간 (예: 10:00~18:00)"
+          value={form.available_time}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
 
         <div>
           <p className="mb-1 font-semibold">희망 제휴 카테고리</p>
@@ -73,8 +132,12 @@ function StoreCreate() {
           ))}
         </div>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          등록하기
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? '등록 중...' : '등록하기'}
         </button>
       </form>
     </div>

@@ -107,3 +107,6 @@ nginx/logs/
 *.bak
 *.swp
 *.tmp
+
+# MkDocs
+site/
