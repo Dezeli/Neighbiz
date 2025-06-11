@@ -800,8 +800,8 @@ function Login() {
 
             <LinksSection>
               <LinkRow>
-                <StyledLink to="/forgot-password">비밀번호 찾기</StyledLink>
-                <StyledLink to="/forgot-username">아이디 찾기</StyledLink>
+                <StyledLink to="/reset-password">비밀번호 찾기</StyledLink>
+                <StyledLink to="/find-id">아이디 찾기</StyledLink>
                 <StyledLink to="/help">고객센터</StyledLink>
               </LinkRow>
               
