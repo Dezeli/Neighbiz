@@ -6,8 +6,6 @@ import defaultImage from '../assets/image.PNG';
 import { extractFirstError } from '../utils/error';
 
 const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
-  
   * {
     margin: 0;
     padding: 0;
@@ -15,14 +13,40 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: #1a1a1a;
-    background-color: #f8fafc;
+    background: #f8fafc;
+    overflow-x: hidden;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  button {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
   }
 `;
 
-// Animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const fadeInUp = keyframes`
   from {
     opacity: 0;
@@ -34,10 +58,10 @@ const fadeInUp = keyframes`
   }
 `;
 
-const fadeInLeft = keyframes`
+const slideIn = keyframes`
   from {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -45,55 +69,87 @@ const fadeInLeft = keyframes`
   }
 `;
 
-const fadeInScale = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+  100% {
+    transform: rotate(360deg);
   }
 `;
 
 const shimmer = keyframes`
   0% {
-    background-position: -468px 0;
+    background-position: -200px 0;
   }
   100% {
-    background-position: 468px 0;
+    background-position: calc(200px + 100%) 0;
   }
 `;
 
 const pulse = keyframes`
   0% {
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
   }
-  50% {
-    transform: scale(1.02);
+  70% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
   }
   100% {
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
   }
 `;
 
-const slideIn = keyframes`
+const float = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+`;
+
+const modalSlideIn = keyframes`
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate(-50%, -60%);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
   }
 `;
 
-// Main Container
 const Container = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 0;
+  padding: 2rem 0;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+  }
+`;
+
+const ContentWrapper = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  animation: ${fadeInUp} 0.8s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
+`;
+
+const HeaderSection = styled.section`
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 3rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   position: relative;
+  overflow: hidden;
 
   &::before {
     content: '';
@@ -101,206 +157,196 @@ const Container = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 300px;
-    background: linear-gradient(135deg, #1a1a1a, #374151);
-    z-index: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    border-radius: 24px 24px 0 0;
   }
-`;
-
-const ContentWrapper = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  position: relative;
-  z-index: 1;
 
   @media (max-width: 768px) {
-    padding: 20px 16px;
-  }
-`;
-
-// Header Section
-const HeaderSection = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 16px;
-  padding: 40px;
-  margin-bottom: 30px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: ${fadeInUp} 0.8s ease;
-
-  @media (max-width: 768px) {
-    padding: 24px;
-    margin-bottom: 20px;
+    padding: 2rem 1.5rem;
   }
 `;
 
 const BackButton = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #374151, #1a1a1a);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  border-radius: 12px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 24px;
-  font-family: 'Pretendard', sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e5e7eb;
+  backdrop-filter: blur(10px);
+  margin-bottom: 2rem;
+
+  &::before {
+    content: '←';
+    font-size: 1.2rem;
+  }
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #1a1a1a, #000000);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #d1d5db;
   }
 
   &:active {
     transform: translateY(0);
   }
 
-  &::before {
-    content: '←';
-    font-size: 1.1rem;
+  @media (max-width: 768px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
   }
 `;
 
 const PostTitle = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1a1a1a;
-  line-height: 1.3;
-  margin-bottom: 16px;
+  color: #1f2937;
+  margin-bottom: 2rem;
   letter-spacing: -0.02em;
+  line-height: 1.2;
 
   @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
   }
 `;
 
 const PostMeta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 `;
 
 const MetaItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: #64748b;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
   font-weight: 500;
+  color: #374151;
+  font-size: 0.95rem;
 
   &::before {
-    content: '${props => props.icon || '•'}';
-    color: #374151;
-    font-weight: bold;
-  }
-`;
-
-// Content Sections
-const ContentSection = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  animation: ${fadeInUp} 0.8s ease;
-  animation-delay: ${props => props.delay || '0s'};
-  animation-fill-mode: both;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    content: '${props => props.icon}';
+    font-size: 1.2rem;
   }
 
   @media (max-width: 768px) {
-    padding: 24px;
-    margin-bottom: 16px;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+`;
+
+const ContentSection = styled.section`
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  animation: ${slideIn} 0.6s ease-out;
+  animation-delay: ${props => props.delay || '0s'};
+  animation-fill-mode: both;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
   }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 20px;
+  color: #1f2937;
+  margin-bottom: 2rem;
   display: flex;
   align-items: center;
-  gap: 12px;
-  letter-spacing: -0.01em;
+  gap: 0.75rem;
 
   &::before {
     content: '';
     width: 4px;
     height: 24px;
-    background: linear-gradient(135deg, #374151, #1a1a1a);
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     border-radius: 2px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
   }
 `;
 
 const SectionContent = styled.div`
-  color: #4a5568;
-  font-size: 1rem;
-  line-height: 1.7;
+  position: relative;
 `;
 
-// Images Section
 const ImagesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  gap: 1.5rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-  }
-
-  @media (max-width: 480px) {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 `;
 
 const ImageCard = styled.div`
   position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  background: #f1f5f9;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  animation: ${fadeInScale} 0.6s ease;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: ${fadeIn} 0.6s ease-out;
   animation-delay: ${props => (props.index * 0.1)}s;
   animation-fill-mode: both;
 
   &:hover {
-    transform: scale(1.03);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   }
 `;
 
 const StyledImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 240px;
   object-fit: cover;
-  display: block;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
+  background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
 
-  &:hover {
+  ${ImageCard}:hover & {
     transform: scale(1.05);
   }
 `;
@@ -312,157 +358,213 @@ const ImageOverlay = styled.div`
   right: 0;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
   color: white;
-  padding: 16px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
 
   ${ImageCard}:hover & {
-    opacity: 1;
+    transform: translateY(0);
   }
 `;
 
-// Info Grid
 const InfoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 1rem;
   }
 `;
 
 const InfoCard = styled.div`
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border: 1px solid #e2e8f0;
-  padding: 24px;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8), rgba(241, 245, 249, 0.8));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
   transition: all 0.3s ease;
-  animation: ${slideIn} 0.6s ease;
-  animation-delay: ${props => (props.index * 0.1)}s;
+  animation: ${fadeIn} 0.6s ease-out;
+  animation-delay: ${props => (props.index * 0.05)}s;
   animation-fill-mode: both;
 
   &:hover {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
   }
 `;
 
 const InfoLabel = styled.div`
   font-size: 0.85rem;
   font-weight: 600;
-  color: #64748b;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
 `;
 
 const InfoValue = styled.div`
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #1a1a1a;
-  line-height: 1.4;
+  color: #1f2937;
+  word-break: break-all;
 `;
 
-// Categories
 const CategoriesList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 1rem;
 `;
 
-const CategoryTag = styled.span`
-  background: linear-gradient(135deg, #374151, #1a1a1a);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+const CategoryTag = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  color: #3b82f6;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
   transition: all 0.3s ease;
-  animation: ${fadeInLeft} 0.6s ease;
-  animation-delay: ${props => (props.index * 0.1)}s;
+  animation: ${fadeIn} 0.6s ease-out;
+  animation-delay: ${props => (props.index * 0.05)}s;
   animation-fill-mode: both;
 
-  &:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #1a1a1a, #000000);
+  &::before {
+    content: '${props => props.icon}';
+    font-size: 1rem;
   }
 
-  &::before {
-    content: '${props => props.icon || '#'}';
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1rem;
     font-size: 0.8rem;
   }
 `;
 
-// Message Section
 const MessageSection = styled.div`
-  background: linear-gradient(135deg, #f8fafc, #ffffff);
-  border-left: 4px solid #374151;
-  padding: 24px;
-  margin-top: 20px;
-  border-radius: 0 12px 12px 0;
-  font-style: italic;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
   position: relative;
-  animation: ${fadeInUp} 0.8s ease 0.4s both;
 
   &::before {
-    content: '"';
+    content: '💬';
     position: absolute;
     top: -10px;
-    left: 20px;
-    font-size: 3rem;
-    color: #9ca3af;
-    font-family: serif;
-    opacity: 0.3;
+    left: 1.5rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const MessageText = styled.p`
   font-size: 1.1rem;
-  line-height: 1.7;
+  line-height: 1.8;
   color: #374151;
-  margin: 0;
-  padding-left: 20px;
+  white-space: pre-line;
+  font-weight: 500;
+  margin-top: 0.5rem;
 `;
 
-// Loading and Error States
+const PartnerButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: ${pulse} 2s infinite;
+
+  &::before {
+    content: '🤝';
+    font-size: 1.3rem;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover::after {
+    left: 100%;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+    animation: none;
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+`;
+
 const LoadingContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
-  gap: 20px;
+  padding: 4rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 `;
 
 const LoadingSpinner = styled.div`
-  width: 60px;
-  height: 60px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #374151;
+  width: 48px;
+  height: 48px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+  animation: ${spin} 0.8s linear infinite;
+  margin-bottom: 1.5rem;
 `;
 
-const LoadingText = styled.div`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #64748b;
-  animation: ${pulse} 2s ease-in-out infinite;
+const LoadingText = styled.p`
+  color: #6b7280;
+  font-size: 1.1rem;
+  font-weight: 500;
 `;
 
 const ErrorContainer = styled.div`
@@ -470,64 +572,192 @@ const ErrorContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
-  gap: 24px;
+  padding: 4rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   text-align: center;
-  padding: 40px;
 `;
 
 const ErrorIcon = styled.div`
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 2rem;
-  animation: ${pulse} 2s ease-in-out infinite;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #fecaca;
 
   &::before {
-    content: '⚠';
+    content: '⚠️';
   }
 `;
 
 const ErrorText = styled.p`
+  color: #dc2626;
   font-size: 1.2rem;
-  color: #64748b;
-  max-width: 500px;
+  font-weight: 600;
+  margin-bottom: 2rem;
   line-height: 1.6;
-  margin-bottom: 20px;
 `;
 
 const ErrorButton = styled.button`
-  background: linear-gradient(135deg, #374151, #1a1a1a);
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Pretendard', sans-serif;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #1a1a1a, #000000);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
-const SkeletonBox = styled.div`
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: ${shimmer} 2s infinite;
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: ${fadeIn} 0.3s ease-out;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  border-radius: 24px;
+  padding: 3rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+  animation: ${modalSlideIn} 0.3s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 2rem;
+    margin: 1rem;
+  }
+`;
+
+const ModalTitle = styled.h3`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  text-align: center;
+
+  &::before {
+    content: '💌';
+    margin-right: 0.5rem;
+  }
+`;
+
+const ModalTextarea = styled.textarea`
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  margin-bottom: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const ModalButton = styled.button`
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+
+  ${props => props.primary ? `
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+  ` : `
+    background: rgba(255, 255, 255, 0.9);
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    
+    &:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+  `}
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const ErrorMessageModal = styled.p`
+  color: #dc2626;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border: 1px solid #fecaca;
   border-radius: 8px;
-  height: ${props => props.height || '20px'};
-  width: ${props => props.width || '100%'};
-  margin-bottom: ${props => props.marginBottom || '12px'};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '⚠️';
+  }
 `;
 
 function PostDetail() {
@@ -733,24 +963,25 @@ function PostDetail() {
           </ContentSection>
 
           <ContentSection delay="0.7s" style={{ textAlign: 'center' }}>
-            <button onClick={() => setIsModalOpen(true)}>제휴 맺어요</button>
+            <PartnerButton onClick={() => setIsModalOpen(true)}>제휴 맺어요</PartnerButton>
           </ContentSection>
 
           {isModalOpen && (
-            <div className="modal">
-              <div className="modal-content">
-                <h3>제휴 요청 메시지</h3>
-                <textarea
+            <Modal>
+              <ModalContent>
+                <ModalTitle>제휴 요청 메시지</ModalTitle>
+                <ModalTextarea
+                  placeholder="제휴를 요청하고 싶은 메시지를 입력해주세요."
                   value={partnerMessage}
                   onChange={(e) => setPartnerMessage(e.target.value)}
                 />
-                {partnerError && <p style={{ color: 'red' }}>{partnerError}</p>}
-                <div>
-                  <button onClick={() => setIsModalOpen(false)}>취소</button>
-                  <button onClick={handlePartnerRequest}>보내기</button>
-                </div>
-              </div>
-            </div>
+                {partnerError && <ErrorMessageModal>{partnerError}</ErrorMessageModal>}
+                <ModalActions>
+                  <ModalButton onClick={() => setIsModalOpen(false)}>취소</ModalButton>
+                  <ModalButton primary onClick={handlePartnerRequest}>보내기</ModalButton>
+                </ModalActions>
+              </ModalContent>
+            </Modal>
           )}
         </ContentWrapper>
       </Container>
