@@ -823,7 +823,7 @@ function StoreCreate() {
 
               <FormSection delay="0.4s">
                 <CategorySection>
-                  <CategoryTitle>희망 제휴 카테고리<RequiredAsterisk>*</RequiredAsterisk></CategoryTitle>
+                  <CategoryTitle>내 가게 카테고리<RequiredAsterisk>*</RequiredAsterisk></CategoryTitle>
                   <CategoryGrid>
                     {categories.map(cat => (
                       <CategoryOption

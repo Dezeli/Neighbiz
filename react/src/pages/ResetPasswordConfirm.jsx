@@ -709,7 +709,7 @@ function ResetPasswordConfirm() {
               새로운 재설정 링크를 요청해주세요.
             </ErrorDescription>
             <Message type="error">{error}</Message>
-            <BackButton to="/forgot-password">
+            <BackButton to="/reset-password">
               ← 비밀번호 찾기로 돌아가기
             </BackButton>
           </ErrorCard>
