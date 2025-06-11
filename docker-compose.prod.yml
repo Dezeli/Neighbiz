@@ -10,7 +10,6 @@ services:
       - .env
     volumes:
       - static_volume:/app/static
-      - media_volume:/app/media
     expose:
       - 8000
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
@@ -33,7 +32,6 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - static_volume:/app/static
-      - media_volume:/app/media
       - react_build:/usr/share/nginx/html
     depends_on:
       - backend
