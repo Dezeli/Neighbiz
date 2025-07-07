@@ -110,6 +110,8 @@ AWS_S3_IMAGE_FOLDER = config("AWS_S3_IMAGE_FOLDER", default="uploads/")
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://3.35.49.173",
+    "http://127.0.0.1"
+    "http://localhost"
 ]
 
 
