@@ -1,6 +1,6 @@
 # Neighbiz
 
-👉 [공식 API 문서 보기](https://dezeli.github.io/neighbiz/)  
+👉 [공식 API 문서 보기](https://dezeli.github.io/Neighbiz/)  
 ---
 
 ## 문서 업데이트 방법
