@@ -773,7 +773,7 @@ function PostCreate() {
         <Header>
           <HeaderContent>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <BackButton onClick={() => navigate('/main')}>
               ← 메인으로 돌아가기

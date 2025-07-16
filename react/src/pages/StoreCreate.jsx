@@ -725,7 +725,7 @@ function StoreCreate() {
         <Header>
           <HeaderContent>
             <Logo onClick={handleBackToMain}>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <BackButton onClick={handleBackToMain}>
               ← 메인으로

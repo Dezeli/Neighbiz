@@ -733,7 +733,7 @@ function ResetPasswordConfirm() {
         <Card>
           <CardHeader>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             {message ? (
               <>

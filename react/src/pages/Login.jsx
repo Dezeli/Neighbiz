@@ -682,7 +682,7 @@ function Login() {
         <LeftPanel>
           <BrandSection>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <BrandTitle>
               믿을 수 있는 비즈니스<br />

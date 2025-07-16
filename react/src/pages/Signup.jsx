@@ -955,7 +955,7 @@ function Signup() {
         <LeftPanel>
           <BrandSection>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <BrandTitle>
               함께 성장하는<br />

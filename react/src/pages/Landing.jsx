@@ -631,7 +631,7 @@ function Landing() {
        <Header className={scrolled ? 'scrolled' : ''}>
          <HeaderContent>
            <Logo>
-             Neigh<span>viz</span>
+             Neigh<span>biz</span>
            </Logo>
            <Nav>
              <NavLink href="#features">서비스 소개</NavLink>
@@ -644,7 +644,7 @@ function Landing() {
 
        <HeroSection>
          <HeroContent>
-           <HeroTitle>비즈니스의 새로운 연결,<br />Neighviz와 함께</HeroTitle>
+           <HeroTitle>비즈니스의 새로운 연결,<br />Neighbiz와 함께</HeroTitle>
            <HeroSubtitle>
              검증된 사업자들과의 신뢰할 수 있는 제휴 매칭 서비스<br />
              AI 기반 매칭으로 최적의 비즈니스 파트너를 찾아보세요
@@ -658,7 +658,7 @@ function Landing() {
 
        <FeaturesSection id="features">
          <SectionContainer>
-           <SectionTitle>왜 성공한 사업자들이 Neighviz를 선택할까요?</SectionTitle>
+           <SectionTitle>왜 성공한 사업자들이 Neighbiz를 선택할까요?</SectionTitle>
            <SectionSubtitle>
              검증된 기술력과 차별화된 서비스로 귀하의 비즈니스 성장을 가속화합니다
            </SectionSubtitle>
@@ -758,7 +758,7 @@ function Landing() {
            <TestimonialsGrid>
              <TestimonialCard>
                <TestimonialText>
-                 "6개월간 찾지 못했던 완벽한 공급업체를 Neighviz에서 하루 만에 찾았습니다. 
+                 "6개월간 찾지 못했던 완벽한 공급업체를 Neighbiz에서 하루 만에 찾았습니다. 
                  매출이 40% 증가했고, 이제 안정적인 공급망을 확보했어요. 정말 혁신적인 서비스입니다."
                </TestimonialText>
                <TestimonialAuthor>
@@ -772,7 +772,7 @@ function Landing() {
              <TestimonialCard>
                <TestimonialText>
                  "스타트업에게는 신뢰할 수 있는 파트너 찾기가 생존과 직결됩니다. 
-                 Neighviz의 검증 시스템 덕분에 걱정 없이 대규모 프로젝트를 진행할 수 있었어요."
+                 Neighbiz의 검증 시스템 덕분에 걱정 없이 대규모 프로젝트를 진행할 수 있었어요."
                </TestimonialText>
                <TestimonialAuthor>
                  <AuthorAvatar>박</AuthorAvatar>
@@ -947,7 +947,7 @@ function Landing() {
          <SectionContainer>
            <SectionTitle style={{color: '#0c4a6e'}}>성공 파트너십 사례</SectionTitle>
            <SectionSubtitle style={{color: '#0369a1'}}>
-             Neighviz를 통해 탄생한 혁신적인 비즈니스 성공 스토리들
+             Neighbiz를 통해 탄생한 혁신적인 비즈니스 성공 스토리들
            </SectionSubtitle>
            <FeaturesGrid>
              <FeatureCard style={{border: '2px solid #0ea5e9'}}>
@@ -980,9 +980,9 @@ function Landing() {
 
        <Section style={{background: 'white'}}>
          <SectionContainer>
-           <SectionTitle>Neighviz만의 차별화된 장점</SectionTitle>
+           <SectionTitle>Neighbiz만의 차별화된 장점</SectionTitle>
            <SectionSubtitle>
-             왜 업계 리더들이 Neighviz를 선택하는지 그 이유를 확인하세요
+             왜 업계 리더들이 Neighbiz를 선택하는지 그 이유를 확인하세요
            </SectionSubtitle>
            <FeaturesGrid>
              <FeatureCard style={{background: 'linear-gradient(135deg, #fef3c7, #fde68a)'}}>
@@ -1052,7 +1052,7 @@ function Landing() {
          <CTAContent>
            <CTATitle>성공하는 사업자들의 선택</CTATitle>
            <CTAText>
-             이미 25,000명의 사업자가 Neighviz와 함께 성장하고 있습니다<br />
+             이미 25,000명의 사업자가 Neighbiz와 함께 성장하고 있습니다<br />
              당신의 비즈니스도 다음 단계로 도약할 준비가 되셨나요?
            </CTAText>
            <CTAButtons>
@@ -1065,13 +1065,13 @@ function Landing() {
        <Footer>
          <FooterContent>
            <FooterSection>
-             <FooterTitle>Neighviz</FooterTitle>
+             <FooterTitle>Neighbiz</FooterTitle>
              <FooterText>
                프리미엄 사업자들을 위한 
                차세대 B2B 파트너십 플랫폼
              </FooterText>
              <FooterText style={{marginTop: '2rem'}}>
-               📧 business@neighviz.com<br />
+               📧 business@neighbiz.com<br />
                📞 1588-0000 (24시간 VIP 라인)<br />
                🏢 서울시 강남구 테헤란로 427, 위워크타워
              </FooterText>
@@ -1112,7 +1112,7 @@ function Landing() {
            </FooterSection>
          </FooterContent>
          <FooterBottom>
-           © 2024 Neighviz Co., Ltd. All rights reserved. | 
+           © 2024 Neighbiz Co., Ltd. All rights reserved. | 
            <FooterLink href="#privacy" style={{marginLeft: '8px'}}>개인정보처리방침</FooterLink> | 
            <FooterLink href="#terms" style={{marginLeft: '8px'}}>서비스 이용약관</FooterLink> | 
            <FooterLink href="#business" style={{marginLeft: '8px'}}>사업자정보확인</FooterLink>

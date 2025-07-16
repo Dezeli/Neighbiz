@@ -747,7 +747,7 @@ function FindID() {
         <LeftPanel>
           <BrandSection>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <BrandTitle>
               아이디를 잊어버리셨나요?
@@ -780,7 +780,7 @@ function FindID() {
               <ContactInfo>
                 고객센터: 1588-0000<br />
                 운영시간: 평일 09:00 - 18:00<br />
-                이메일: help@neighviz.com
+                이메일: help@neighbiz.com
               </ContactInfo>
             </ContactSection>
           </BrandSection>

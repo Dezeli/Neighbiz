@@ -845,7 +845,7 @@ function Main() {
         <Header>
           <HeaderContent>
             <Logo>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <HeaderActions>
               <NotificationButton onClick={() => {

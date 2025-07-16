@@ -748,7 +748,7 @@ function MyPage() {
         <Header>
           <HeaderContent>
             <Logo onClick={() => navigate('/')}>
-              Neigh<span>viz</span>
+              Neigh<span>biz</span>
             </Logo>
             <HeaderActions>
               <HeaderButton onClick={() => navigate('/')}>홈으로</HeaderButton>
