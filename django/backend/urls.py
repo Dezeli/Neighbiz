@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/v1/posts/", include("posts.urls")),
     path("api/v1/stores/", include("stores.urls")),
     path("api/v1/notifications/", include("notifications.urls")),
+    path("api/v1/b2c/auth/", include("coupons.urls")),
     re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
 ]
 

@@ -41,6 +41,7 @@ class ConsumerAuth(models.Model):
 
 class CouponQR(models.Model):
     store = models.OneToOneField("stores.Store", on_delete=models.CASCADE, related_name="coupon_qr")
+    token = models.UUIDField(default=uuid.uuid4, unique=True, db_index=True)
     image_url = models.URLField(help_text="S3에 저장된 QR 코드 이미지 경로")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
